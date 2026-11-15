@@ -9,19 +9,19 @@ number:
 date:
 consensus: true
 v: 3
-area: INT
-workgroup: TIPTOP
+# area: INT
+# workgroup: TIPTOP
 keyword:
  - IPv6 prefixes
  - IPN Allocators
  - DTN
 venue:
-  group: TIPTOP
-  type: Working Group
-  mail: tiptop@ietf.org
-  arch: https://example.com/WG
-  github: ekline/draft-ipn-allocator-prefixes
-  latest: https://example.com/LATEST
+#  group: TIPTOP
+#  type: Working Group
+#  mail: tiptop@ietf.org
+#  arch: https://example.com/WG
+  github: "ekline/draft-ipn-allocator-prefixes"
+  latest: "https://ekline.github.io/draft-ipn-allocator-prefixes/draft-ipn-allocator-prefixes.html"
 
 author:
  -
