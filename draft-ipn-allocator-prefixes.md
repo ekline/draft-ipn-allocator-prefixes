@@ -19,28 +19,28 @@
 # Change the file extension to match the format (.xml for XML, etc...)
 #
 ###
-title: "TODO - Your title"
-abbrev: "TODO - Abbreviation"
+title: "IPv6 Prefixes Derived from IPN Allocator Identifiers"
+abbrev: "IPN Allocator Prefixes"
 category: info
 
-docname: draft-todo-yourname-protocol-latest
+docname: draft-ipn-allocator-prefixes-latest
 submissiontype: IETF  # also: "independent", "editorial", "IAB", or "IRTF"
 number:
 date:
 consensus: true
 v: 3
-area: AREA
-workgroup: WG Working Group
+area: INT
+workgroup: TIPTOP
 keyword:
- - next generation
- - unicorn
- - AI-native
+ - IPv6 prefixes
+ - IPN Allocators
+ - DTN
 venue:
-  group: WG
+  group: TIPTOP
   type: Working Group
-  mail: WG@example.com
+  mail: tiptop@ietf.org
   arch: https://example.com/WG
-  github: USER/REPO
+  github: ekline/draft-ipn-allocator-prefixes
   latest: https://example.com/LATEST
 
 author:
