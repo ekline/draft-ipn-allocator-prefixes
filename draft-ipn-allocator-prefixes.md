@@ -26,6 +26,7 @@ venue:
 author:
  -
     fullname: "Erik Kline"
+    organization: "Aalyria Technologies Inc."
     email: "ek.ietf@gmail.com"
 
 normative:
@@ -46,7 +47,11 @@ informative:
   RFC9171:
   RFC9602:
   RFC9812:
-  I-D.limarsjenwar-tiptop-address-space:
+  RFC1897:
+  RFC7421:
+  RFC7608:
+  RFC3701:
+  RFC5156:
   IANA-IPV6-SPACE:
     title: "IPv6 Address Space"
     author:
@@ -91,7 +96,7 @@ It does not require a new per-identifier registry.
 This document defines an address assignment mechanism.
 The mechanism applies to terrestrial networks and to space networks.
 
-This document does not define:
+This document does NOT define:
 
 * a conversion between an IPN endpoint identifier and an IPv6 address;
 
@@ -112,13 +117,12 @@ This document does not define:
 An Allocator already manages a namespace for IPN Node Numbers.
 A corresponding IPv6 prefix can simplify address administration for networks that use both IPN identifiers and IPv6 addresses.
 
-Physical location does not determine network connectivity or transit policy.
-This document does not assign prefixes to celestial bodies.
-Other work discusses that approach {{I-D.limarsjenwar-tiptop-address-space}}.
+Physical location does NOT determine network connectivity or transit policy.
+This document does NOT assign prefixes to celestial bodies.
 
 An Allocator can retain its derived prefix when its equipment changes location.
 Continued reachability depends on the available routes and applicable routing policy.
-This document does not change routing scalability or define a mobility mechanism.
+This document does not change routing scalability nor define a mobility mechanism.
 
 
 # Conventions and Definitions {#conventions}
@@ -133,9 +137,7 @@ Allocator:
 
 Allocator Identifier:
 : An unsigned 32-bit integer A that identifies an Allocator ({{Section 3.2 of RFC9758}}).
-
-Holder:
-: The Allocator to which the IANA registry {{IANA-IPN}} currently assigns a given Allocator Identifier.
+  "The Allocator of A" is the Allocator that the IANA registry {{IANA-IPN}} currently lists for A.
 
 Common prefix:
 : The IPv6 /16 prefix that this document requests.
@@ -149,7 +151,7 @@ Eligible identifier:
   {{eligibility}} gives the rules.
 
 An Allocator can hold more than one Allocator Identifier ({{Section 3.2 of RFC9758}}).
-Each assigned Allocator Identifier has exactly one Holder.
+Each Allocator Identifier is associated with only one Allocator.
 This document provides one derived prefix for each eligible identifier.
 Thus, one Allocator can have more than one derived prefix.
 
@@ -164,10 +166,18 @@ Eligibility under this document is different from permission to deploy the reque
 This document does not authorize deployment of 5f01::/16 before that allocation.
 Until then, an Allocator MUST NOT treat an eligible identifier as permission to use 5f01::/16.
 
+The requested prefix is in 5f00::/8.
+The first instance of the 6bone experimental network used 5f00::/8 for IPv6 testing {{RFC1897}} {{RFC3701}}.
+That block was later returned to IANA for future allocation {{RFC5156}}.
+This document specifies an experiment.
+Thus, the former 6bone testing block is a suitable source for the common prefix.
+
 {{RFC9602}} assigned 5f00::/16 for Segment Routing over IPv6 (SRv6) Segment Identifiers (SIDs).
-The requested prefix is the /16 that immediately follows 5f00::/16.
-This adjacency is a preference.
-The mechanism does not depend on adjacency or on SRv6.
+After that assignment, the free space in 5f00::/8 is eight aligned blocks, from 5f01::/16 up to 5f80::/9.
+Allocation of 5f01::/16 uses one of these blocks completely.
+Allocation of any other /16 splits a larger block into smaller blocks.
+Thus, this document requests the next available /16.
+The mechanism does not depend on the specific /16 value or on SRv6.
 
 Note to the RFC Editor:
 Replace "5f01" with the value that IANA assigns, then remove this note.
@@ -215,11 +225,20 @@ The examples in this document use the recommended text form ({{Section 4 of RFC5
 
 ## Allocator-Controlled Address Space {#allocator-space}
 
-Bits 48 to 127 of each address are under the control of the Holder.
-These 80 bits support ordinary IPv6 address assignment {{RFC4291}}.
-For example, an Allocator can use 16 subnet bits and a 64-bit interface identifier.
-This document does not require a particular encoding in these 80 bits.
-The Holder can delegate parts of its derived prefix, such as a /56, under its own policy.
+Bits 48 to 127 of each address in P(A) are under the control of the Allocator of A.
+The entire /48 is available to the Allocator.
+Only the address assignment and routing policies of the Allocator govern its use.
+
+This document does not require a particular structure or encoding in these 80 bits.
+In particular, it does not require a /64 subnet boundary or a 64-bit interface identifier.
+The Allocator can assign or delegate prefixes of any length within P(A).
+IPv6 forwarding supports prefixes of any length {{RFC7608}}.
+The policy of the Allocator determines whether to use mechanisms that depend on 64-bit interface identifiers {{RFC7421}}.
+
+{{Section 2.5.1 of RFC4291}} requires 64-bit interface identifiers for most unicast addresses.
+Addresses in the common prefix are an exception to that requirement.
+{{RFC9602}} describes a similar exception for SRv6 SIDs in 5f00::/16.
+This document might need to update {{RFC4291}} to make this exception formal ({{open-issues}}).
 
 
 # Eligibility and Optional Use {#eligibility}
@@ -228,12 +247,12 @@ The current IANA "'ipn' Scheme URI Allocator Identifiers" registry {{IANA-IPN}} 
 The rules that follow apply to each Allocator Identifier A.
 
 1. Ordinary assignment:
-   A current ordinary assignment of A permits the Holder to use P(A).
+   A current ordinary assignment of A permits the Allocator of A to use P(A).
    An ordinary assignment is a registry entry that assigns A to a named Allocator, alone or in a range.
    Rules 3 to 7 take precedence over this rule.
 
 2. Optional use:
-   The Holder decides whether to use P(A).
+   The Allocator of A decides whether to use P(A).
    This document does not require a second registration for each identifier.
 
 3. Unassigned identifiers:
@@ -263,7 +282,7 @@ A party MUST NOT use addresses from P(A) under this specification unless both co
 
 * A is an eligible identifier.
 
-* The party is the Holder of A, or the Holder of A has authorized the party.
+* The party is the Allocator of A, or the Allocator of A has authorized the party.
 {: spacing="compact"}
 
 
@@ -276,23 +295,6 @@ This document reserves P(0), which is 5f01::/48, for future specification.
 This document does not define a subdivision of P(0).
 
 
-
-# Allocator Identifier Ranges {#ranges}
-
-{{RFC9758}} permits aligned ranges of Allocator Identifiers ({{Section 3.2.1 of RFC9758}}).
-An aligned range contains 2^k identifiers.
-The k least significant bits of the first identifier B in the range are zero.
-
-An aligned range of 2^k identifiers maps to an IPv6 prefix of length 48 - k.
-That prefix contains the first 48 - k bits of P(B).
-Each identifier in the range still has its own /48.
-
-A contiguous identifier range permits a corresponding address aggregate.
-It does not establish a route to that aggregate.
-An operator must assess connectivity and routing policy before advertising an aggregate.
-Aggregation is not automatic.
-The Holder decides whether to advertise each derived prefix, the aggregate, or no route.
-Each identifier in the range remains subject to the rules in {{eligibility}}.
 
 
 # Examples {#examples}
@@ -346,24 +348,17 @@ Operators MAY exchange routes and traffic for derived prefixes between administr
 Such exchange is subject to agreement between the operators and to their routing policies.
 This design does not guarantee acceptance of derived prefixes on the public Internet.
 
-The SRv6 block 5f00::/16 is not globally reachable {{RFC9602}}.
-This document does not copy that restriction.
-The adjacency of the two blocks does not imply the same routing treatment.
-A filter for 5f00::/15 matches both blocks.
-An operator that filters SRv6 SIDs at a domain boundary needs to filter 5f00::/16 exactly.
-
-
-# Changes in Control {#control}
+Some networks filter 5f00::/8 as unallocated former 6bone space {{RFC5156}}.
+Some networks also filter 5f00::/16 at Segment Routing domain boundaries {{RFC9602}}.
+A filter that covers more than 5f00::/16 also blocks derived prefixes.
+An operator that uses derived prefixes needs to confirm that such filters do not block its traffic.
 
 Eligibility follows the current registry assignment of each Allocator Identifier.
-The registry can withdraw an assignment or reassign an Allocator Identifier.
-After such a change, the former Holder loses its authority to use the derived prefix under this document.
-Delegations from the former Holder also lose their basis under this document.
-
-A withdrawal or reassignment can require address changes and route withdrawal.
-It can also require updates to authorization records, such as route registry objects.
-A former Holder MUST NOT retain authority over P(A) solely because it previously held A.
-A reassignment requires coordination to prevent simultaneous use by unrelated Holders.
+If the registry withdraws or reassigns A, the previous Allocator of A loses its authority to use P(A) under this document.
+Delegations from the previous Allocator also lose their basis.
+An Allocator MUST NOT retain authority over P(A) solely because it previously held A.
+The change can require address changes, route withdrawal, and updates to authorization records.
+The previous and new Allocators need to coordinate to prevent simultaneous use of P(A).
 This document does not define a reassignment delay or an automatic revocation protocol.
 
 
@@ -371,7 +366,7 @@ This document does not define a reassignment delay or an automatic revocation pr
 
 An address in a derived prefix exposes the associated Allocator Identifier.
 The Allocator Identifier is public information in the IANA registry.
-An observer can use it to associate traffic with the Holder.
+An observer can use it to associate traffic with the Allocator.
 
 An Allocator Identifier is not proof of identity.
 An attacker can configure an address in the derived prefix of another Allocator.
@@ -385,8 +380,8 @@ It does not create Route Origin Authorizations (ROAs) or a new trust anchor.
 Routing authorization for derived prefixes is an issue for review ({{open-issues}}).
 
 Reassignment can leave stale configuration and stale authorization.
-Stale filters can block traffic for a new Holder.
-Stale authorization can let a former Holder continue to originate routes.
+Stale filters can block traffic for the new Allocator of A.
+Stale authorization can let the previous Allocator of A continue to originate routes.
 
 Experimental identifiers do not provide exclusive ownership.
 More than one party can use the same experimental identifier.
@@ -406,7 +401,7 @@ Coordination of registry policy is an issue for review ({{open-issues}}).
 IANA is requested to allocate a /16 address block for "IPv6 Prefixes Derived from IPN Allocator Identifiers".
 The preferred address block is 5f01::/16.
 
-This block is in 4000::/3.
+This block is in 5f00::/8, the former 6bone testing block ({{common-prefix}}), within 4000::/3.
 The "IPv6 Address Space" registry {{IANA-IPV6-SPACE}} lists 4000::/3 as "Reserved by IETF".
 Allocations from this space require IETF Review {{RFC9812}}.
 
@@ -526,6 +521,15 @@ Registry treatment of excluded identifiers:
 Effects on IPN assignment policy:
 : The working choice makes no change to IPN assignment procedures.
   The Designated Experts for the IPN registry need to review the incentives in {{security}}.
+
+Relation to the RFC 4291 interface identifier rule:
+: The working choice imposes no /64 boundary within a derived prefix ({{allocator-space}}).
+  This conflicts with the 64-bit interface identifier rule in {{Section 2.5.1 of RFC4291}}.
+  {{RFC9602}} states a similar exception without a formal update to RFC 4291.
+  This document follows that approach for now.
+  Unlike SRv6 SIDs, addresses in derived prefixes can be assigned to host interfaces.
+  Thus, review can require a formal update.
+  In that case, this document will add "Updates: 4291".
 
 Routing authorization and reassignment procedures:
 : The working choice ties authority to the current IPN registry assignment.
