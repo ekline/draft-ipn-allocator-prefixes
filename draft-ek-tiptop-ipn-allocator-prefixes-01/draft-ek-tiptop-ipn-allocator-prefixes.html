@@ -1,0 +1,2163 @@
+<!DOCTYPE html>
+<html lang="en" class="Internet-Draft">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>IPv6 Prefixes Derived from IPN Allocator Identifiers</title>
+<meta content="Erik Kline" name="author">
+<meta content="
+       This document requests an IPv6 /16 prefix for use by IPN Allocators.
+It defines a method to derive an IPv6 /48 prefix from a 32-bit IPN Allocator Identifier.
+Use of the derived prefix is optional.
+The method reuses the existing IPN Allocator registry.
+It does not encode physical location or define a routing mechanism.
+The preferred /16 prefix is 5f01::/16.
+This document also updates RFC 4291 to permit other interface identifier lengths within the allocated block. 
+    " name="description">
+<meta content="xml2rfc 3.35.0" name="generator">
+<meta content="IPv6 prefixes" name="keyword">
+<meta content="IPN Allocators" name="keyword">
+<meta content="DTN" name="keyword">
+<meta content="draft-ek-tiptop-ipn-allocator-prefixes-latest" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.35.0
+    Python 3.14.10
+    ConfigArgParse 1.9.0
+    google-i18n-address 3.1.1
+    intervaltree 3.2.1
+    Jinja2 3.1.6
+    lxml 6.1.1
+    natsort 8.4.0
+    platformdirs 4.14.3
+    pycountry 24.6.1
+    PyYAML 6.0.3
+    requests 2.33.1
+    wcwidth 0.9.4
+-->
+<link href="draft-ek-tiptop-ipn-allocator-prefixes.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Lora SemiBold'), local('Lora-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light dark;
+  --background-color: #fff;
+  --text-color: #222;
+  --title-color: #191919;
+  --link-color: #2a6496;
+  --highlight-color: #f9f9f9;
+  --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
+  --small-font-size: 14.5px;
+  --font-mono: 'Oxygen Mono', monospace;
+  --font-title: "Sofia Sans Semi Condensed", sans-serif;
+  scrollbar-color: #bbb #eee;
+}
+body {
+  max-width: 600px;
+  margin: 75px auto;
+  padding: 0 5px;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  font: 16px/22px "Lora", serif;
+  scroll-behavior: smooth;
+}
+
+.ears {
+  display: none;
+}
+
+/* headings */
+section {
+  clear: both;
+}
+.section-number {
+  padding-right: 0.5em;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-title);
+  font-weight: 680;
+  margin: 0.8em 0 0.3em;
+  font-size-adjust: 0.5;
+  color: var(--title-color);
+}
+h1 {
+  &#title {
+    font-size: 32px;
+    line-height: 40px;
+    clear: both;
+    margin: 1.5em 0 0.2em;
+  }
+  &#rfcnum {
+    margin: 1.5em 0 0.2em;
+    & + h1#title {
+      margin: 0.2em 0;
+    }
+  }
+}
+
+h1, h2, h3 {
+  font-size: 22px;
+  line-height: 27px;
+}
+h4, h5, h6 {
+  font-size: 20px;
+  line-height: 24px;
+}
+
+/* general structure */
+.author {
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+#abstract+p {
+  font-size: 18px;
+  line-height: 24px;
+  & code, & samp, & tt {
+    font-size: 16px;
+    line-height: 0;
+  }
+}
+
+p {
+  padding: 0;
+  margin: 0.5em 0;
+  text-align: left;
+}
+div {
+  margin: 0;
+}
+.alignRight {
+  margin: 1em 0;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    margin: 0;
+    float: right;
+    clear: both;
+  }
+  & > *:nth-child(2) {
+    clear: both;
+    display: block;
+    border: none;
+  }
+}
+svg {
+  display: block;
+  /* font-family isn't space-separated, but =~ will have to do */
+  &[font-family~="monospace" i], & [font-family~="monospace" i] {
+    font-family: var(--font-mono);
+  }
+}
+.alignCenter {
+  margin: 1em 0;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+       support flexbox yet.
+    */
+    display: table;
+    margin: 0 auto;
+  }
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 0.5em 2em;
+  & :is(ol, ul) {
+    margin-left: 1em;
+  }
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+  & li {
+    margin-top: 0.5em;
+  }
+}
+:is(ul, ol).compact, .ulCompact, .olCompact {
+  margin: 0 0 0 2em;
+  & li {
+    margin: 0;
+    & :first-child { margin-top: 0; }
+    & :last-child { margin-bottom: 0; }
+  }
+}
+
+/* definition lists */
+dl {
+  clear: left;
+  --indent: 3ch;
+  /* --indent: attr(indent ch); not supported in any browser, but we can dream */
+  &.olPercent {
+    --indent: 5ch;
+    & > dt {
+      min-width: calc(var(--indent) - 2ch);
+      float: none;
+    }
+  }
+
+  dl > dd > & {
+    margin-top: 0.5em;
+    margin-bottom: 0;
+  }
+
+  &:not(.dlNewline) > dt {
+    float: left;
+    margin-right: 2ch;
+    min-width: 8ch;
+  }
+  & > dd {
+    margin-bottom: .8em;
+    margin-left: var(--indent) !important; /* stupid element overrides */
+    min-height: 2ex;
+  }
+}
+:is(dl.compact, .dlCompact) > dd {
+  margin-bottom: 0;
+  & > :is(:first-child, .break:first-child + *) {
+    margin-top: 0;
+  }
+  & > :is(:last-child) {
+    margin-bottom: 0;
+  }
+}
+:is(dd, span).break {
+  display: none;
+}
+
+/* links */
+a {
+  text-decoration: none;
+  &[href] {
+    color: var(--link-color);
+    &:hover { text-decoration: underline; }
+    &.selfRef {
+      color: var(--text-color);
+      &:hover {
+        text-decoration: none;
+        background-color: var(--highlight-color);
+      }
+    }
+  }
+}
+.iref + a[href].internal {
+  color: var(--text-color);
+}
+a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
+  white-space: nowrap;
+}
+
+/* Figures */
+tt, code, pre {
+  background-color: var(--highlight-color);
+  font: 14px/22px var(--font-mono);
+}
+tt, code {
+  /* changing the font for inline elements leads to different ascender
+     and descender heights; as we want to retain baseline alignment,
+     remove leading to avoid altering the final height of lines
+     note: this fails if these blocks take an entire line,
+     a different solution would be great */
+  line-height: 0;
+}
+:is(h1, h2, h3, h4, h5, h6) :is(tt, code) {
+  font-size: 84%;
+}
+pre {
+  border: 1px solid var(--line-color);
+  font-size: 13.5px;
+  line-height: 16px;
+  letter-spacing: -0.2px;
+  margin: 5px;
+  padding: 5px;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0.5em 0;
+  padding: 0;
+  & blockquote {
+    margin: 0.8em 0.4em 0.4em;
+  }
+}
+figcaption, caption {
+  font-style: italic;
+  margin: 0.5em 1.5em;
+  text-align: left;
+  caption-side: bottom;
+}
+@media screen {
+  /* Auto-collapse boilerplate. */
+  :is(#status-of-memo, #copyright) {
+    & p {
+      margin: -2px 0;
+      max-height: 0;
+      transition: max-height 2s ease, margin 0.5s ease 0.5s;
+      overflow: hidden;
+    }
+    &:hover p,
+    & h2:target ~ p {
+      margin: 0.5em 0;
+      max-height: 500px;
+      overflow: auto;
+    }
+  }
+  pre, svg {
+    display: inline-block;
+    /* In the horizontal direction, sometimes people make over-sized figures.
+       Scrollbars for those is therefore necessary: auto adds them as necessary..
+       In the vertical direction, the line-height can combine with the font
+       asender/descender height to produce scrollbars: hidden avoids that. */
+    overflow: auto hidden;
+  }
+  pre {
+    max-width: 100%;
+    width: calc(100% - 22px - 1em);
+  }
+  svg {
+    max-width: calc(100% - 22px - 1em);
+  }
+  figure pre {
+    display: block;
+    width: calc(100% - 25px);
+  }
+  :is(pre, svg) + .pilcrow {
+    display: inline-block;
+    vertical-align: text-bottom;
+    padding-bottom: 8px;
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 0 2em;
+  font-style: italic;
+}
+blockquote {
+  margin: 1em 0;
+  border-left: 2px var(--pilcrow-strong) solid;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+
+/* tables */
+table {
+  width: auto;
+  max-width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+  &.right { margin-left: auto; }
+  &.center { margin-left: auto; margin-right: auto; }
+  &.left { margin-right: auto; }
+  & .text-left { text-align: left; }
+  & .text-center { text-align: center; }
+  & .text-right { text-align: right; }
+  & caption {
+    margin: 0;
+    padding: 3px 0 3px 1em;
+  }
+  & p { margin: 0; }
+}
+
+thead, tbody {
+  border: 1px solid var(--line-color);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 5px 10px;
+}
+th {
+  background-color: var(--line-color);
+}
+:is(tr:nth-child(2n), thead+tbody > tr:nth-child(2n+1)) > td {
+  background-color: var(--background-color);
+}
+:is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
+  background-color: var(--highlight-color);
+}
+
+/* pilcrow */
+a.pilcrow {
+  margin-left: 3px;
+  opacity: 0.2;
+  user-select: none;
+  &[href] {
+    color: var(--pilcrow-weak);
+    &:hover { text-decoration: none; }
+  }
+  @media not print {
+    :hover > &, &:focus {
+      opacity: 1;
+    }
+    &[href]:hover {
+      color: var(--pilcrow-strong);
+      background-color: transparent;
+    }
+  }
+  @media print {
+    display: none;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid var(--line-color);
+}
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: 600;
+  font-size: var(--small-font-size);
+}
+.role {
+  font-variant: all-small-caps;
+}
+sub, sup {
+  line-height: 1;
+  font-size: 80%;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: var(--small-font-size);
+  line-height: 18px;
+  --identifier-width: 15ch;
+  & dt {
+    width: var(--identifier-width);
+    min-width: var(--identifier-width);
+    clear: left;
+    float: left;
+    text-align: right;
+    margin-right: 1ch;
+  }
+  & dd {
+    margin: 0;
+    margin-left: calc(1em + var(--identifier-width)) !important;
+    min-width: 5em;
+  }
+  & .authors {
+    & .author {
+      display: inline-block;
+      margin-right: 1.5em;
+    }
+    & .org {
+      font-style: italic;
+    }
+  }
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #999;
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+  & .prepared {
+    float: right;
+  }
+}
+
+/* table of contents */
+#toc {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+
+  & nav {
+    & ul {
+      margin: 0 0.5em 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    & li {
+      line-height: 1.3em;
+      margin: 2px 0;
+      padding-left: 1.2em;
+      text-indent: -1.2em;
+    }
+  }
+  & a.xref {
+    white-space: normal;
+  }
+}
+
+.references {
+  & > dt {
+    text-align: right;
+    font-weight: bold;
+    min-width: 10ch;
+    margin-right: 1.5ch;
+    &:target::before {
+      content: "⇒";
+      margin: 0 10px 0 -25px;
+    }
+  }
+  & > dd {
+    margin-left: 12ch !important;
+    overflow: visible;
+    & .refInstance {
+      margin-bottom: 0.8em;
+    }
+    & .ascii {
+      margin-bottom: 0.25em;
+    }
+  }
+}
+
+#rfc\.index\.index + ul {
+  margin-left: 0;
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  max-width: 20em;
+  margin: 1em auto 1em 0;
+
+  & .nameRole {
+    font-weight: 700;
+    margin-left: 0;
+  }
+  & .label {
+    margin: 0.5em 0;
+  }
+  & .type {
+    display: none;
+  }
+  & .alternative-contact {
+    margin: 0.5em 0 0.25em 0;
+  }
+  & .non-ascii {
+    margin: 0 0 0 2em;
+  }
+  & div.left {
+    text-align: left;
+  }
+  & div.right {
+    text-align: right;
+  }
+}
+
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+@media (min-width: 500px) {
+  #authors-addresses {
+    & > section {
+      column-count: 2;
+      column-gap: 20px;
+    }
+    & > section > h2 {
+      column-span: all;
+    }
+    /* hack for break-inside: avoid-column */
+    & address {
+      display: inline-block;
+      break-inside: avoid-column;
+    }
+  }
+}
+
+/* Comments */
+.rfcEditorRemove {
+  & p:first-of-type {
+    font-style: italic;
+  }
+}
+.cref {
+  background-color: rgba(249, 232, 105, 0.3);
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+
+@media screen {
+  #toc {
+    & nav {
+      font-family: var(--font-title);
+      font-weight: 360;
+      & > ul { margin-bottom: 2em; }
+      & ul {
+        margin: 0 0 0 4px;
+        & :is(p, li) {
+          margin: 2px 0;
+        }
+      }
+    }
+    & a.toplink {
+      float: right;
+    }
+  }
+}
+@media not screen {
+  #toc a.toplink {
+    display: none;
+  }
+}
+
+
+/* TOC layout for smaller screens */
+@media screen and (max-width: 929px) {
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 1px 0 0 0;
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    opacity: 0.6;
+    & h2 {
+      margin: 0;
+      padding: 2px 0 2px 6px;
+      padding-right: 1em;
+      font-size: 18px;
+      line-height: 24px;
+      min-width: 190px;
+      text-align: right;
+      background-color: #444;
+      color: white;
+      cursor: pointer;
+      &::before { /* css hamburger */
+        float: right;
+        position: relative;
+        width: 1em;
+        height: 1px;
+        left: -164px;
+        margin: 8px 0 0 0;
+        background: white none repeat scroll 0 0;
+        box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+        content: "";
+      }
+    }
+    & nav {
+      display: none;
+      background-color: var(--background-color);
+      padding: 0.5em 1em 1em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      height: calc(100vh - 48px);
+      border-left: 1px solid #ddd;
+    }
+    &.active {
+      opacity: 1;
+      & nav { display: block; }
+    }
+    /* Make the collapsed ToC header render white on gray also when it's a link */
+    & h2 a,
+    & h2 a:is(:link, :focus, :hover),
+    & a.toplink,
+    & a.toplink:hover {
+      color: white;
+      background-color: #444;
+      text-decoration: none;
+    }
+    & a.toplink {
+      margin: 2px 0.5em 0;
+    }
+  }
+}
+
+/* TOC layout for wide screens */
+@media screen and (min-width: 930px) {
+  body {
+    padding-right: 360px;
+    padding-right: calc(min(180px + 20%, 500px));
+  }
+  #toc {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    right: calc(50vw - 480px);
+    width: 312px;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+    & h2 {
+      margin: 0;
+      padding: 0.25em 1em 1em 0;
+    }
+    & nav {
+      display: block;
+      height: calc(90vh - 84px);
+      bottom: 0;
+      padding: 0.5em 0 2em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+    }
+    & a.toplink {
+      margin: 8px 0.5em 0;
+    }
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc {
+    page-break-before: always;
+    border-top: none;
+    padding-top: 0;
+  }
+  #n-introduction {
+    page-break-before: always;
+  }
+  figure, pre, .vcard {
+    page-break-inside: avoid;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  :is(h2, h3, h4, h5, h6)+*, dd {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+}
+
+/* Dark mode. */
+@media (prefers-color-scheme: dark) {
+:root {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+  scrollbar-color: #777 #333;
+}
+}
+
+/* SVG Trick: a prefix match works because only black and white are allowed */
+svg {
+  & :is([stroke="black"], [stroke^="#000"]) {
+    stroke: var(--text-color);
+  }
+  & :is([stroke="white"], [stroke^="#fff"]) {
+    stroke: var(--background-color);
+  }
+  & :is([fill="black"], [fill^="#000"], :not([fill], [fill] *)) {
+    fill: var(--text-color);
+  }
+  & :is([fill="white"], [fill^="#fff"]) {
+    fill: var(--background-color);
+  }
+}
+</style>
+
+</head>
+<body class="xml2rfc">
+<table class="ears">
+<thead><tr>
+<td class="left">Internet-Draft</td>
+<td class="center">IPN Allocator Prefixes</td>
+<td class="right">November 2026</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Kline</td>
+<td class="center">Expires 20 May 2027</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">Network Working Group</dd>
+<dt class="label-internet-draft">Internet-Draft:</dt>
+<dd class="internet-draft">draft-ek-tiptop-ipn-allocator-prefixes-latest</dd>
+<dt class="label-updates">Updates:</dt>
+<dd class="updates">
+<a href="https://www.rfc-editor.org/rfc/rfc4291" class="eref">4291</a> (if approved)</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2026-11-16" class="published">16 November 2026</time>
+    </dd>
+<dt class="label-intended-status">Intended Status:</dt>
+<dd class="intended-status">Experimental</dd>
+<dt class="label-expires">Expires:</dt>
+<dd class="expires"><time datetime="2027-05-20">20 May 2027</time></dd>
+<dt class="label-authors">Author:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">E. Kline</div>
+<div class="org">Aalyria Technologies Inc.</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">IPv6 Prefixes Derived from IPN Allocator Identifiers</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">This document requests an IPv6 /16 prefix for use by IPN Allocators.
+It defines a method to derive an IPv6 /48 prefix from a 32-bit IPN Allocator Identifier.
+Use of the derived prefix is optional.
+The method reuses the existing IPN Allocator registry.
+It does not encode physical location or define a routing mechanism.
+The preferred /16 prefix is 5f01::/16.
+This document also updates RFC 4291 to permit other interface identifier lengths within the allocated block.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<section class="note rfcEditorRemove" id="section-note.1">
+      <h2 id="name-about-this-document">
+<a href="#name-about-this-document" class="section-name selfRef">About This Document</a>
+      </h2>
+<p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
+<p id="section-note.1-2">
+        The latest revision of this draft can be found at <span><a href="https://ekline.github.io/draft-ipn-allocator-prefixes/draft-ek-tiptop-ipn-allocator-prefixes.html">https://ekline.github.io/draft-ipn-allocator-prefixes/draft-ek-tiptop-ipn-allocator-prefixes.html</a></span>.
+        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-ek-tiptop-ipn-allocator-prefixes/">https://datatracker.ietf.org/doc/draft-ek-tiptop-ipn-allocator-prefixes/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+<p id="section-note.1-3">Source for this draft and an issue tracker can be found at
+        <span><a href="https://github.com/ekline/draft-ipn-allocator-prefixes">https://github.com/ekline/draft-ipn-allocator-prefixes</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+        This Internet-Draft is submitted in full conformance with the
+        provisions of BCP 78 and BCP 79.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+        Internet-Drafts are working documents of the Internet Engineering Task
+        Force (IETF). Note that other groups may also distribute working
+        documents as Internet-Drafts. The list of current Internet-Drafts is
+        at <span><a href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+        Internet-Drafts are draft documents valid for a maximum of six months
+        and may be updated, replaced, or obsoleted by other documents at any
+        time. It is inappropriate to use Internet-Drafts as reference
+        material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-4">
+        This Internet-Draft will expire on 20 May 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2026 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document. Code Components extracted from this
+            document must include Revised BSD License text as described in
+            Section 4.e of the Trust Legal Provisions and are provided without
+            warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
+                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="auto internal xref">1.1</a>.  <a href="#name-scope" class="internal xref">Scope</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.2">
+                <p id="section-toc.1-1.1.2.2.1" class="keepWithNext"><a href="#section-1.2" class="auto internal xref">1.2</a>.  <a href="#name-motivation" class="internal xref">Motivation</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.3">
+                <p id="section-toc.1-1.1.2.3.1" class="keepWithNext"><a href="#section-1.3" class="auto internal xref">1.3</a>.  <a href="#name-experiment-scope" class="internal xref">Experiment Scope</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-prefix-construction" class="internal xref">Prefix Construction</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-common-prefix" class="internal xref">Common Prefix</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-address-layout" class="internal xref">Address Layout</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3">
+                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="auto internal xref">3.3</a>.  <a href="#name-derivation" class="internal xref">Derivation</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4">
+                <p id="section-toc.1-1.3.2.4.1"><a href="#section-3.4" class="auto internal xref">3.4</a>.  <a href="#name-allocator-controlled-addres" class="internal xref">Allocator-Controlled Address Space</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.5">
+                <p id="section-toc.1-1.3.2.5.1"><a href="#section-3.5" class="auto internal xref">3.5</a>.  <a href="#name-update-to-rfc-4291" class="internal xref">Update to RFC 4291</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.6">
+                <p id="section-toc.1-1.3.2.6.1"><a href="#section-3.6" class="auto internal xref">3.6</a>.  <a href="#name-address-configuration" class="internal xref">Address Configuration</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-eligibility-and-optional-us" class="internal xref">Eligibility and Optional Use</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-the-default-allocator" class="internal xref">The Default Allocator</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-examples" class="internal xref">Examples</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-routing-and-operational-con" class="internal xref">Routing and Operational Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
+                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-ipv6-address-space-registry" class="internal xref">IPv6 Address Space Registry</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-ipv6-special-purpose-addres" class="internal xref">IPv6 Special-Purpose Address Space Registry</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.3">
+                <p id="section-toc.1-1.8.2.3.1"><a href="#section-8.3" class="auto internal xref">8.3</a>.  <a href="#name-more-specific-entries" class="internal xref">More-Specific Entries</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.4">
+                <p id="section-toc.1-1.8.2.4.1"><a href="#section-8.4" class="auto internal xref">8.4</a>.  <a href="#name-ipn-scheme-uri-allocator-id" class="internal xref">'ipn' Scheme URI Allocator Identifiers Registry</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
+                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
+                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-open-issues" class="internal xref">Open Issues</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#appendix-B" class="auto internal xref">Appendix B</a>.  <a href="#name-changes-since-00" class="internal xref">Changes Since -00</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
+            <p id="section-toc.1-1.12.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="intro">
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">An IPN Allocator Identifier <span>[<a href="#RFC9758" class="cite xref">RFC9758</a>]</span> identifies an authority that assigns IPN Node Numbers.
+This document associates an optional IPv6 prefix with that authority.
+The association does not describe network topology.
+It does not identify a next hop or establish a route.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">An Allocator can use the derived prefix to assign IPv6 addresses within networks under its administration.
+The method reuses the existing "'ipn' Scheme URI Allocator Identifiers" registry <span>[<a href="#IANA-IPN" class="cite xref">IANA-IPN</a>]</span>.
+It does not require a new per-identifier registry.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<div id="scope">
+<section id="section-1.1">
+        <h3 id="name-scope">
+<a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-scope" class="section-name selfRef">Scope</a>
+        </h3>
+<p id="section-1.1-1">This document defines an address assignment mechanism.
+The mechanism applies to terrestrial networks and to space networks.
+This document also updates <span>[<a href="#RFC4291" class="cite xref">RFC4291</a>]</span> for addresses within the common prefix (<a href="#update-4291" class="auto internal xref">Section 3.5</a>).<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+<p id="section-1.1-2">This document does not define:<a href="#section-1.1-2" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="section-1.1-3.1">
+            <p id="section-1.1-3.1.1">a conversion between an IPN endpoint identifier and an IPv6 address;<a href="#section-1.1-3.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="compact" id="section-1.1-3.2">
+            <p id="section-1.1-3.2.1">an encoding of an IPN Node Number or Service Number in an IPv6 address;<a href="#section-1.1-3.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="compact" id="section-1.1-3.3">
+            <p id="section-1.1-3.3.1">a Bundle Protocol <span>[<a href="#RFC9171" class="cite xref">RFC9171</a>]</span> convergence layer;<a href="#section-1.1-3.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="compact" id="section-1.1-3.4">
+            <p id="section-1.1-3.4.1">a method to carry IPv6 packets in bundles;<a href="#section-1.1-3.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="compact" id="section-1.1-3.5">
+            <p id="section-1.1-3.5.1">a routing protocol or an automatic route discovery mechanism; or<a href="#section-1.1-3.5.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="compact" id="section-1.1-3.6">
+            <p id="section-1.1-3.6.1">a requirement to use IPv6 in all Delay-Tolerant Networking (DTN) deployments.<a href="#section-1.1-3.6.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="motivation">
+<section id="section-1.2">
+        <h3 id="name-motivation">
+<a href="#section-1.2" class="section-number selfRef">1.2. </a><a href="#name-motivation" class="section-name selfRef">Motivation</a>
+        </h3>
+<p id="section-1.2-1">An Allocator already manages a namespace for IPN Node Numbers.
+A corresponding IPv6 prefix can simplify address administration for networks that use both IPN identifiers and IPv6 addresses.<a href="#section-1.2-1" class="pilcrow">¶</a></p>
+<p id="section-1.2-2">Physical location does not determine network connectivity or transit policy.
+This document does not assign prefixes to celestial bodies.<a href="#section-1.2-2" class="pilcrow">¶</a></p>
+<p id="section-1.2-3">An Allocator can retain its derived prefix when its equipment changes location.
+Continued reachability depends on the available routes and applicable routing policy.
+This document makes no routing scalability guarantee.
+It does not define a mobility mechanism.<a href="#section-1.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="experiment">
+<section id="section-1.3">
+        <h3 id="name-experiment-scope">
+<a href="#section-1.3" class="section-number selfRef">1.3. </a><a href="#name-experiment-scope" class="section-name selfRef">Experiment Scope</a>
+        </h3>
+<p id="section-1.3-1">This document specifies an experiment.
+The experiment evaluates these questions:<a href="#section-1.3-1" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="section-1.3-2.1">
+            <p id="section-1.3-2.1.1">whether registry-derived prefixes simplify address administration;<a href="#section-1.3-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="compact" id="section-1.3-2.2">
+            <p id="section-1.3-2.2.1">whether participating implementations support the intended address structures;<a href="#section-1.3-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="compact" id="section-1.3-2.3">
+            <p id="section-1.3-2.3.1">whether routing and filtering permit the intended connectivity; and<a href="#section-1.3-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="compact" id="section-1.3-2.4">
+            <p id="section-1.3-2.4.1">whether changes in Allocator control can occur without conflicting assignments.<a href="#section-1.3-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-1.3-3">This document encourages operators and implementers to publish reports of their deployment experience.
+The experiment makes no claim of automatic route aggregation or improved routing scalability.<a href="#section-1.3-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="conventions">
+<section id="section-2">
+      <h2 id="name-conventions-and-definitions">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-conventions-and-definitions" class="section-name selfRef">Conventions and Definitions</a>
+      </h2>
+<p id="section-2-1">The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
+"<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as
+described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
+appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
+<p id="section-2-2">This document uses the terms "Node Number" and "Service Number" as defined in <span>[<a href="#RFC9758" class="cite xref">RFC9758</a>]</span>.
+This document also uses the terms that follow.<a href="#section-2-2" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-2-3">
+        <dt id="section-2-3.1">Allocator:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.2">
+          <p id="section-2-3.2.1">An organization or other authority that assigns IPN Node Numbers (<span><a href="https://rfc-editor.org/rfc/rfc9758#section-3.2" class="relref">Section 3.2</a> of [<a href="#RFC9758" class="cite xref">RFC9758</a>]</span>).<a href="#section-2-3.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.3">Allocator Identifier:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.4">
+          <p id="section-2-3.4.1">An unsigned 32-bit integer A that identifies an Allocator (<span><a href="https://rfc-editor.org/rfc/rfc9758#section-3.2" class="relref">Section 3.2</a> of [<a href="#RFC9758" class="cite xref">RFC9758</a>]</span>).
+"The Allocator of A" is the Allocator that the IANA registry <span>[<a href="#IANA-IPN" class="cite xref">IANA-IPN</a>]</span> currently lists for A.<a href="#section-2-3.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.5">Common prefix:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.6">
+          <p id="section-2-3.6.1">The IPv6 /16 prefix that this document requests.
+The preferred value is 5f01::/16.<a href="#section-2-3.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.7">Derived prefix:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.8">
+          <p id="section-2-3.8.1">The IPv6 /48 prefix P(A) associated with one Allocator Identifier A.<a href="#section-2-3.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-3.9">Eligible identifier:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-3.10">
+          <p id="section-2-3.10.1">An Allocator Identifier that this document permits for ordinary use.
+<a href="#eligibility" class="auto internal xref">Section 4</a> gives the rules.<a href="#section-2-3.10.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
+<p id="section-2-4">An Allocator can hold more than one Allocator Identifier (<span><a href="https://rfc-editor.org/rfc/rfc9758#section-3.2" class="relref">Section 3.2</a> of [<a href="#RFC9758" class="cite xref">RFC9758</a>]</span>).
+Each Allocator Identifier is associated with only one Allocator.
+This document provides one derived prefix for each eligible identifier.
+Thus, one Allocator can have more than one derived prefix.<a href="#section-2-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="construction">
+<section id="section-3">
+      <h2 id="name-prefix-construction">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-prefix-construction" class="section-name selfRef">Prefix Construction</a>
+      </h2>
+<div id="common-prefix">
+<section id="section-3.1">
+        <h3 id="name-common-prefix">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-common-prefix" class="section-name selfRef">Common Prefix</a>
+        </h3>
+<p id="section-3.1-1">This document requests 5f01::/16 as the common prefix.
+Until IANA allocates the common prefix, 5f01::/16 is requested and unassigned for this purpose.
+Until then, an Allocator <span class="bcp14">MUST NOT</span> treat an eligible identifier as permission to use 5f01::/16.
+The allocation requires IETF Review (<a href="#iana-space" class="auto internal xref">Section 8.1</a>).<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-2">The first instance of the 6bone experimental network used 5f00::/8 for IPv6 testing <span>[<a href="#RFC1897" class="cite xref">RFC1897</a>]</span> <span>[<a href="#RFC3701" class="cite xref">RFC3701</a>]</span>.
+That block was later returned to IANA for future allocation <span>[<a href="#RFC5156" class="cite xref">RFC5156</a>]</span>.
+<span>[<a href="#RFC9602" class="cite xref">RFC9602</a>]</span> then assigned 5f00::/16 for Segment Routing over IPv6 (SRv6) Segment Identifiers (SIDs).<a href="#section-3.1-2" class="pilcrow">¶</a></p>
+<p id="section-3.1-3">Allocating 5f01::/16 extends the allocation adjacent to 5f00::/16.
+Within the remaining 5f00::/8 space, this choice avoids splitting a larger aligned block.
+The mechanism does not depend on the specific /16 value or on SRv6.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
+<p id="section-3.1-4">Note to the RFC Editor:
+If IANA allocates a /16 other than 5f01::/16, replace "5f01" with the allocated value throughout this document.
+This replacement includes the derived prefixes, the examples, and the IANA entries.
+Also revise the rationale in this section and the filter text in <a href="#routing" class="auto internal xref">Section 6</a>.
+Then remove this note.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="layout">
+<section id="section-3.2">
+        <h3 id="name-address-layout">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-address-layout" class="section-name selfRef">Address Layout</a>
+        </h3>
+<p id="section-3.2-1">This document numbers the 128 bits of an IPv6 address from 0 to 127.
+Bit 0 is the most significant bit.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<span id="name-layout-of-an-address-in-a-d"></span><div id="tab-layout">
+<table class="center" id="table-1">
+          <caption>
+<a href="#table-1" class="selfRef">Table 1</a>:
+<a href="#name-layout-of-an-address-in-a-d" class="selfRef">Layout of an Address in a Derived Prefix</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Bits</th>
+              <th class="text-right" rowspan="1" colspan="1">Length</th>
+              <th class="text-left" rowspan="1" colspan="1">Field</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">0-15</td>
+              <td class="text-right" rowspan="1" colspan="1">16 bits</td>
+              <td class="text-left" rowspan="1" colspan="1">Common prefix</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">16-47</td>
+              <td class="text-right" rowspan="1" colspan="1">32 bits</td>
+              <td class="text-left" rowspan="1" colspan="1">Allocator Identifier</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">48-127</td>
+              <td class="text-right" rowspan="1" colspan="1">80 bits</td>
+              <td class="text-left" rowspan="1" colspan="1">Allocator-controlled address space</td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+<p id="section-3.2-3">The requirements that follow apply to each party that constructs a derived prefix.
+The derived prefix <span class="bcp14">MUST</span> contain the complete 32-bit Allocator Identifier immediately after the common prefix.
+The identifier <span class="bcp14">MUST</span> appear in network byte order.
+Leading zero bits are significant in this binary field.
+The lengths of the decimal text form and of the Concise Binary Object Representation (CBOR) <span>[<a href="#RFC8949" class="cite xref">RFC8949</a>]</span> encoding have no effect on the field.
+A 16-bit common prefix and a 32-bit Allocator Identifier produce a /48.<a href="#section-3.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="derivation">
+<section id="section-3.3">
+        <h3 id="name-derivation">
+<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-derivation" class="section-name selfRef">Derivation</a>
+        </h3>
+<p id="section-3.3-1">For an Allocator Identifier A, define two 16-bit values:<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="section-3.3-2.1">
+            <p id="section-3.3-2.1.1">H = floor(A / 65536), the 16 most significant bits of A<a href="#section-3.3-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="compact" id="section-3.3-2.2">
+            <p id="section-3.3-2.2.1">L = A modulo 65536, the 16 least significant bits of A<a href="#section-3.3-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-3.3-3">With the requested common prefix, the derived prefix is:<a href="#section-3.3-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.3-4">
+<pre>
+P(A) = 5f01:H:L::/48
+</pre><a href="#section-3.3-4" class="pilcrow">¶</a>
+</div>
+<p id="section-3.3-5">H and L are written as hexadecimal fields of the IPv6 text form (<span><a href="https://rfc-editor.org/rfc/rfc4291#section-2.2" class="relref">Section 2.2</a> of [<a href="#RFC4291" class="cite xref">RFC4291</a>]</span>).
+The examples in this document use the recommended text form (<span><a href="https://rfc-editor.org/rfc/rfc5952#section-4" class="relref">Section 4</a> of [<a href="#RFC5952" class="cite xref">RFC5952</a>]</span>).<a href="#section-3.3-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="allocator-space">
+<section id="section-3.4">
+        <h3 id="name-allocator-controlled-addres">
+<a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-allocator-controlled-addres" class="section-name selfRef">Allocator-Controlled Address Space</a>
+        </h3>
+<p id="section-3.4-1">Bits 48 to 127 of each address in P(A) are under the control of the Allocator of A.
+The Allocator controls address assignment and prefix delegation within P(A).
+These activities remain subject to this document and applicable IPv6 specifications.
+This document does not require a particular structure or encoding in these 80 bits.<a href="#section-3.4-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-3.4-2">
+          <dt id="section-3.4-2.1">Assignment:</dt>
+          <dd style="margin-left: 1.5em" id="section-3.4-2.2">
+            <p id="section-3.4-2.2.1">The Allocator can assign prefixes of any length within P(A).
+Ordinary /64 subnets remain permitted.<a href="#section-3.4-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-3.4-2.3">Routing and forwarding:</dt>
+          <dd style="margin-left: 1.5em" id="section-3.4-2.4">
+            <p id="section-3.4-2.4.1">IPv6 forwarding processes support prefixes of any length <span>[<a href="#RFC7608" class="cite xref">RFC7608</a>]</span>.
+Routing policy determines which prefix lengths operators advertise and accept.
+Forwarding support does not establish support for host address configuration.<a href="#section-3.4-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-3.4-2.5">Host interface addresses:</dt>
+          <dd style="margin-left: 1.5em" id="section-3.4-2.6">
+            <p id="section-3.4-2.6.1"><a href="#update-4291" class="auto internal xref">Section 3.5</a> permits interface identifiers other than 64 bits within the common prefix.
+Host and link support for other lengths varies (<a href="#slaac" class="auto internal xref">Section 3.6</a>).<a href="#section-3.4-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="update-4291">
+<section id="section-3.5">
+        <h3 id="name-update-to-rfc-4291">
+<a href="#section-3.5" class="section-number selfRef">3.5. </a><a href="#name-update-to-rfc-4291" class="section-name selfRef">Update to RFC 4291</a>
+        </h3>
+<p id="section-3.5-1">For addresses within the common prefix, this document removes the requirement for a 64-bit interface identifier.
+This exception updates Sections 2.5.1 and 2.5.4 of <span>[<a href="#RFC4291" class="cite xref">RFC4291</a>]</span>.
+It applies only to the common prefix allocated by this document.<a href="#section-3.5-1" class="pilcrow">¶</a></p>
+<p id="section-3.5-2"><span><a href="https://rfc-editor.org/rfc/rfc4291#section-2.5.1" class="relref">Section 2.5.1</a> of [<a href="#RFC4291" class="cite xref">RFC4291</a>]</span>, as updated by <span><a href="https://rfc-editor.org/rfc/rfc7136#section-5" class="relref">Section 5</a> of [<a href="#RFC7136" class="cite xref">RFC7136</a>]</span>, requires 64-bit interface identifiers for unicast addresses that do not start with binary 000.
+<span><a href="https://rfc-editor.org/rfc/rfc4291#section-2.5.4" class="relref">Section 2.5.4</a> of [<a href="#RFC4291" class="cite xref">RFC4291</a>]</span> states the same constraint for Global Unicast addresses.
+This document adds the text that follows after each of these two statements:<a href="#section-3.5-2" class="pilcrow">¶</a></p>
+<ul class="normal ulEmpty">
+<li class="normal ulEmpty" id="section-3.5-3.1">
+            <p id="section-3.5-3.1.1">This requirement does not apply to addresses within the IPv6 block allocated for IPv6 Prefixes Derived from IPN Allocator Identifiers (RFC XXXX).
+In that block, an interface identifier can have any length that the subnet prefix permits.<a href="#section-3.5-3.1.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-3.5-4">Note to the RFC Editor:
+Replace "RFC XXXX" with the number of this document, then remove this note.<a href="#section-3.5-4" class="pilcrow">¶</a></p>
+<p id="section-3.5-5">All other text of Section 2.5.1, as updated by <span>[<a href="#RFC7136" class="cite xref">RFC7136</a>]</span>, still applies.
+For example, a 64-bit interface identifier derived from an IEEE MAC-layer address still uses the Modified EUI-64 format.<a href="#section-3.5-5" class="pilcrow">¶</a></p>
+<p id="section-3.5-6"><span>[<a href="#RFC9602" class="cite xref">RFC9602</a>]</span> is a limited precedent for this exception.
+Its discussion of <span>[<a href="#RFC4291" class="cite xref">RFC4291</a>]</span> concerns SRv6 SIDs that are not assigned to host interfaces.<a href="#section-3.5-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="slaac">
+<section id="section-3.6">
+        <h3 id="name-address-configuration">
+<a href="#section-3.6" class="section-number selfRef">3.6. </a><a href="#name-address-configuration" class="section-name selfRef">Address Configuration</a>
+        </h3>
+<p id="section-3.6-1">This exception does not change SLAAC or link-specific address configuration procedures.
+Operators must select address structures that their hosts and links support.<a href="#section-3.6-1" class="pilcrow">¶</a></p>
+<p id="section-3.6-2">In Stateless Address Autoconfiguration (SLAAC), a host forms an address from an advertised prefix and an interface identifier.
+A link-type specification defines the length of that interface identifier.
+Many link-type specifications define a length of 64 bits (<span><a href="https://rfc-editor.org/rfc/rfc7421#section-4.1" class="relref">Section 4.1</a> of [<a href="#RFC7421" class="cite xref">RFC7421</a>]</span>).
+The host ignores the prefix for address formation if the two lengths do not sum to 128 bits (<span><a href="https://rfc-editor.org/rfc/rfc4862#section-5.5.3" class="relref">Section 5.5.3</a> of [<a href="#RFC4862" class="cite xref">RFC4862</a>]</span>, item (d)).
+Thus, SLAAC on such links forms addresses only from /64 prefixes.
+This document does not define a new SLAAC mechanism.<a href="#section-3.6-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="eligibility">
+<section id="section-4">
+      <h2 id="name-eligibility-and-optional-us">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-eligibility-and-optional-us" class="section-name selfRef">Eligibility and Optional Use</a>
+      </h2>
+<p id="section-4-1">The current IANA "'ipn' Scheme URI Allocator Identifiers" registry <span>[<a href="#IANA-IPN" class="cite xref">IANA-IPN</a>]</span> determines eligibility.
+The rules that follow apply to each Allocator Identifier A.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="compact type-1" id="section-4-2">
+<li id="section-4-2.1">
+          <p id="section-4-2.1.1">Ordinary assignment:
+A current ordinary assignment of A permits the Allocator of A to assign addresses and delegate prefixes from P(A).
+An ordinary assignment is a registry entry that assigns A to a named Allocator, alone or in a range.
+Rules 3 to 7 take precedence over this rule.<a href="#section-4-2.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-4-2.2">
+          <p id="section-4-2.2.1">Optional use:
+The Allocator of A decides whether to use P(A).
+This document does not require a second registration for each identifier.<a href="#section-4-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-4-2.3">
+          <p id="section-4-2.3.1">Unassigned identifiers:
+An unassigned identifier does not permit use of its derived prefix.<a href="#section-4-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-4-2.4">
+          <p id="section-4-2.4.1">Reserved identifiers:
+A reserved identifier does not permit ordinary use.
+The reserved identifiers include 0x80000000 to 0xFFFFFFFF.<a href="#section-4-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-4-2.5">
+          <p id="section-4-2.5.1">Experimental identifiers:
+Identifiers in the Experimental Use range (0x40000000 to 0x7FFFFFFF) do not confer exclusive control of globally unique IPv6 prefixes.
+This document does not specify operational use of their derived prefixes.<a href="#section-4-2.5.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-4-2.6">
+          <p id="section-4-2.6.1">Example Range:
+The IPN Example Range (974848 to 978943) is for documentation (<span><a href="https://rfc-editor.org/rfc/rfc9758#section-9.1" class="relref">Section 9.1</a> of [<a href="#RFC9758" class="cite xref">RFC9758</a>]</span>).
+Its derived prefixes are not for operational deployment.<a href="#section-4-2.6.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-4-2.7">
+          <p id="section-4-2.7.1">Allocator Identifier zero:
+Allocator Identifier zero does not permit ordinary use under this specification.
+<a href="#default-allocator" class="auto internal xref">Section 4.1</a> gives the reason.<a href="#section-4-2.7.1" class="pilcrow">¶</a></p>
+</li>
+      </ol>
+<p id="section-4-3">An Allocator Identifier is an eligible identifier only if rule 1 applies and rules 3 to 7 do not exclude it.
+No other text in this document makes an Allocator Identifier eligible.<a href="#section-4-3" class="pilcrow">¶</a></p>
+<p id="section-4-4">A party <span class="bcp14">MUST NOT</span> assign addresses or delegate prefixes from P(A) unless A is eligible and the party has authority from the Allocator of A.
+These eligibility rules govern address assignment and prefix delegation.
+They do not require a router to query the IPN registry when forwarding a packet.<a href="#section-4-4" class="pilcrow">¶</a></p>
+<div id="default-allocator">
+<section id="section-4.1">
+        <h3 id="name-the-default-allocator">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-the-default-allocator" class="section-name selfRef">The Default Allocator</a>
+        </h3>
+<p id="section-4.1-1"><span>[<a href="#RFC9758" class="cite xref">RFC9758</a>]</span> assigns Allocator Identifier zero to the Default Allocator (<span><a href="https://rfc-editor.org/rfc/rfc9758#section-3.2.2" class="relref">Section 3.2.2</a> of [<a href="#RFC9758" class="cite xref">RFC9758</a>]</span>).
+The Default Allocator serves multiple independent organizations.
+Assignment of a Node Number by the Default Allocator does not assign control of the derived /48.
+This document reserves P(0), which is 5f01::/48, for future specification.
+This document does not define a subdivision of P(0).<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="examples">
+<section id="section-5">
+      <h2 id="name-examples">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-examples" class="section-name selfRef">Examples</a>
+      </h2>
+<p id="section-5-1">The examples in this section are illustrations.
+They use the requested common prefix 5f01::/16 and identifiers from the IPN Example Range.
+They do not represent operational IPv6 assignments.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<span id="name-example-derived-prefixes"></span><div id="tab-examples">
+<table class="center" id="table-2">
+        <caption>
+<a href="#table-2" class="selfRef">Table 2</a>:
+<a href="#name-example-derived-prefixes" class="selfRef">Example Derived Prefixes</a>
+        </caption>
+<thead>
+          <tr>
+            <th class="text-right" rowspan="1" colspan="1">Allocator Identifier</th>
+            <th class="text-left" rowspan="1" colspan="1">Hexadecimal value</th>
+            <th class="text-left" rowspan="1" colspan="1">Derived prefix</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-right" rowspan="1" colspan="1">974848</td>
+            <td class="text-left" rowspan="1" colspan="1">0x000EE000</td>
+            <td class="text-left" rowspan="1" colspan="1">5f01:e:e000::/48</td>
+          </tr>
+          <tr>
+            <td class="text-right" rowspan="1" colspan="1">974849</td>
+            <td class="text-left" rowspan="1" colspan="1">0x000EE001</td>
+            <td class="text-left" rowspan="1" colspan="1">5f01:e:e001::/48</td>
+          </tr>
+          <tr>
+            <td class="text-right" rowspan="1" colspan="1">978943</td>
+            <td class="text-left" rowspan="1" colspan="1">0x000EEFFF</td>
+            <td class="text-left" rowspan="1" colspan="1">5f01:e:efff::/48</td>
+          </tr>
+        </tbody>
+      </table>
+</div>
+<p id="section-5-3">For A = 974849, H is 14 (0xe) and L is 57345 (0xe001).
+The complete Example Range contains 4096 (2^12) identifiers, from 0x000EE000 to 0x000EEFFF.
+The 12 least significant bits of 0x000EE000 are zero.
+Thus, the range maps to a prefix of length 48 - 12 = 36:<a href="#section-5-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-5-4">
+<pre>
+5f01:e:e000::/36
+</pre><a href="#section-5-4" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="routing">
+<section id="section-6">
+      <h2 id="name-routing-and-operational-con">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-routing-and-operational-con" class="section-name selfRef">Routing and Operational Considerations</a>
+      </h2>
+<p id="section-6-1">This document specifies address assignment only.
+The principles that follow apply to derived prefixes:<a href="#section-6-1" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="section-6-2.1">
+          <p id="section-6-2.1.1">A derived prefix does not establish connectivity.<a href="#section-6-2.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="compact" id="section-6-2.2">
+          <p id="section-6-2.2.1">An address assignment does not require another network to accept a route.<a href="#section-6-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="compact" id="section-6-2.3">
+          <p id="section-6-2.3.1">A shared Allocator does not imply a shared routing domain.<a href="#section-6-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="compact" id="section-6-2.4">
+          <p id="section-6-2.4.1">An Allocator can operate disconnected networks.<a href="#section-6-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="compact" id="section-6-2.5">
+          <p id="section-6-2.5.1">Routing policy determines permitted route advertisements and transit.<a href="#section-6-2.5.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="compact" id="section-6-2.6">
+          <p id="section-6-2.6.1">A prefix does not indicate contact times, delay, or available capacity.<a href="#section-6-2.6.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="compact" id="section-6-2.7">
+          <p id="section-6-2.7.1">Ordinary IPv6 addresses remain available through other assignment mechanisms.<a href="#section-6-2.7.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-6-3">An Allocator Identifier alone provides no evidence of reachability.
+Operators determine reachability through their routing mechanisms and policies.<a href="#section-6-3" class="pilcrow">¶</a></p>
+<p id="section-6-4">This document does not define an inherent administrative domain boundary for the common prefix.
+Operators <span class="bcp14">MAY</span> exchange routes and traffic for derived prefixes between administrative domains.
+Such exchange is subject to agreement between the operators and to their routing policies.
+This design does not guarantee acceptance of derived prefixes on the public Internet.<a href="#section-6-4" class="pilcrow">¶</a></p>
+<p id="section-6-5">Existing filters can reject traffic from this block.
+Operators need to check filters for unallocated IPv6 space and former 6bone space <span>[<a href="#RFC5156" class="cite xref">RFC5156</a>]</span>.
+A filter that matches only the SRv6 block 5f00::/16 <span>[<a href="#RFC9602" class="cite xref">RFC9602</a>]</span> does not match 5f01::/16.
+Broader filters, such as a filter for 5f00::/8, can match both blocks.<a href="#section-6-5" class="pilcrow">¶</a></p>
+<p id="section-6-6">If the IPN registry withdraws or reassigns A, the previous Allocator of A loses its authority over P(A) under this document.<a href="#section-6-6" class="pilcrow">¶</a></p>
+<p id="section-6-7">An Allocator <span class="bcp14">MUST NOT</span> retain authority over P(A) solely because it previously held A.
+A change to the contact information of a registry entry alone does not reassign the Allocator Identifier.
+Registry changes do not automatically update deployed addresses, routes, filters, or authorization records.
+The previous and new Allocators need to coordinate these updates to prevent simultaneous use of P(A).<a href="#section-6-7" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="security">
+<section id="section-7">
+      <h2 id="name-security-considerations">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      </h2>
+<p id="section-7-1">An address in a derived prefix exposes the associated Allocator Identifier.
+The Allocator Identifier is public information in the IANA registry.
+An observer can use it to associate traffic with the Allocator.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-2">An Allocator Identifier is not proof of identity.
+An attacker can configure an address in the derived prefix of another Allocator.
+The arithmetic mapping does not authenticate packets or authorize route advertisements.
+Registry information does not, by itself, authenticate a route origin.<a href="#section-7-2" class="pilcrow">¶</a></p>
+<p id="section-7-3">Route leaks and unauthorized route advertisements remain possible.
+An operator that accepts a route for a derived prefix needs to verify the origin under its own policy.
+This document does not create Resource Public Key Infrastructure (RPKI) <span>[<a href="#RFC6480" class="cite xref">RFC6480</a>]</span> certificates.
+It does not create Route Origin Authorizations (ROAs) or a new trust anchor.<a href="#section-7-3" class="pilcrow">¶</a></p>
+<p id="section-7-4">After reassignment, stale filters can block traffic for the new Allocator of A.
+Stale authorization can let the previous Allocator of A continue to originate routes.<a href="#section-7-4" class="pilcrow">¶</a></p>
+<p id="section-7-5">More than one party can use the same experimental identifier.
+For this reason, rule 5 in <a href="#eligibility" class="auto internal xref">Section 4</a> excludes these identifiers from ordinary use.<a href="#section-7-5" class="pilcrow">¶</a></p>
+<p id="section-7-6">Interface identifiers shorter than 64 bits reduce the address space that an attacker needs to scan (<span><a href="https://rfc-editor.org/rfc/rfc7421#section-5" class="relref">Section 5</a> of [<a href="#RFC7421" class="cite xref">RFC7421</a>]</span>).<a href="#section-7-6" class="pilcrow">¶</a></p>
+<p id="section-7-7">IPv6 prefix eligibility can create new incentives to request IPN Allocator Identifiers or large identifier ranges.
+An aligned range of 2^k identifiers maps to an aggregate of length 48 - k.
+The existing IPN assignment procedures were not designed solely to distribute IPv6 address space.<a href="#section-7-7" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="iana">
+<section id="section-8">
+      <h2 id="name-iana-considerations">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+      </h2>
+<div id="iana-space">
+<section id="section-8.1">
+        <h3 id="name-ipv6-address-space-registry">
+<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-ipv6-address-space-registry" class="section-name selfRef">IPv6 Address Space Registry</a>
+        </h3>
+<p id="section-8.1-1">IANA is requested to allocate a /16 address block for "IPv6 Prefixes Derived from IPN Allocator Identifiers".
+The preferred address block is 5f01::/16.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
+<p id="section-8.1-2">This block is in 5f00::/8, the former 6bone testing block (<a href="#common-prefix" class="auto internal xref">Section 3.1</a>), within 4000::/3.
+The "IPv6 Address Space" registry <span>[<a href="#IANA-IPV6-SPACE" class="cite xref">IANA-IPV6-SPACE</a>]</span> lists 4000::/3 as "Reserved by IETF".
+Allocations from this space require IETF Review <span>[<a href="#RFC9812" class="cite xref">RFC9812</a>]</span>.<a href="#section-8.1-2" class="pilcrow">¶</a></p>
+<p id="section-8.1-3">A 16-bit common prefix and a 32-bit identifier produce a /48.
+A smaller block cannot preserve this complete mapping.<a href="#section-8.1-3" class="pilcrow">¶</a></p>
+<p id="section-8.1-4">IANA is requested to update the "IPv6 Address Space" registry entry for 4000::/3 to reference this document.<a href="#section-8.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="iana-special">
+<section id="section-8.2">
+        <h3 id="name-ipv6-special-purpose-addres">
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-ipv6-special-purpose-addres" class="section-name selfRef">IPv6 Special-Purpose Address Space Registry</a>
+        </h3>
+<p id="section-8.2-1">IANA is requested to add the entry that follows to the "IPv6 Special-Purpose Address Space" registry <span>[<a href="#IANA-IPV6-SPECIAL" class="cite xref">IANA-IPV6-SPECIAL</a>]</span>.
+<span>[<a href="#RFC6890" class="cite xref">RFC6890</a>]</span> and <span>[<a href="#RFC8190" class="cite xref">RFC8190</a>]</span> define the fields.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlCompact dlParallel" id="section-8.2-2">
+          <dt id="section-8.2-2.1">Address Block:</dt>
+          <dd style="margin-left: 1.5em" id="section-8.2-2.2">
+            <p id="section-8.2-2.2.1">5f01::/16<a href="#section-8.2-2.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-8.2-2.3">Name:</dt>
+          <dd style="margin-left: 1.5em" id="section-8.2-2.4">
+            <p id="section-8.2-2.4.1">IPv6 Prefixes Derived from IPN Allocator Identifiers<a href="#section-8.2-2.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-8.2-2.5">RFC:</dt>
+          <dd style="margin-left: 1.5em" id="section-8.2-2.6">
+            <p id="section-8.2-2.6.1">This document<a href="#section-8.2-2.6.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-8.2-2.7">Allocation Date:</dt>
+          <dd style="margin-left: 1.5em" id="section-8.2-2.8">
+            <p id="section-8.2-2.8.1">The date that IANA allocates the common prefix<a href="#section-8.2-2.8.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-8.2-2.9">Termination Date:</dt>
+          <dd style="margin-left: 1.5em" id="section-8.2-2.10">
+            <p id="section-8.2-2.10.1">N/A<a href="#section-8.2-2.10.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-8.2-2.11">Source:</dt>
+          <dd style="margin-left: 1.5em" id="section-8.2-2.12">
+            <p id="section-8.2-2.12.1">True<a href="#section-8.2-2.12.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-8.2-2.13">Destination:</dt>
+          <dd style="margin-left: 1.5em" id="section-8.2-2.14">
+            <p id="section-8.2-2.14.1">True<a href="#section-8.2-2.14.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-8.2-2.15">Forwardable:</dt>
+          <dd style="margin-left: 1.5em" id="section-8.2-2.16">
+            <p id="section-8.2-2.16.1">True<a href="#section-8.2-2.16.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-8.2-2.17">Globally Reachable:</dt>
+          <dd style="margin-left: 1.5em" id="section-8.2-2.18">
+            <p id="section-8.2-2.18.1">True<a href="#section-8.2-2.18.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-8.2-2.19">Reserved-by-Protocol:</dt>
+          <dd style="margin-left: 1.5em" id="section-8.2-2.20">
+            <p id="section-8.2-2.20.1">False<a href="#section-8.2-2.20.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+<p id="section-8.2-3">These values are deliberate initial design choices.
+They permit ordinary IPv6 forwarding across administrative boundaries.
+"Globally Reachable" indicates that a router can forward these datagrams beyond an administrative domain <span>[<a href="#RFC8190" class="cite xref">RFC8190</a>]</span>.
+It does not guarantee a route.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
+<p id="section-8.2-4">The parent entry does not make every derived prefix eligible.
+IANA is requested to add this note to the parent entry:
+"Address assignment and prefix delegation within this block are subject to the eligibility rules in Section 4 of this document."<a href="#section-8.2-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="iana-exceptions">
+<section id="section-8.3">
+        <h3 id="name-more-specific-entries">
+<a href="#section-8.3" class="section-number selfRef">8.3. </a><a href="#name-more-specific-entries" class="section-name selfRef">More-Specific Entries</a>
+        </h3>
+<p id="section-8.3-1">Some derived prefixes are not for ordinary use.
+IANA is requested to add the more-specific entries in <a href="#tab-exceptions" class="auto internal xref">Table 3</a>.
+These entries take precedence over the parent entry.<a href="#section-8.3-1" class="pilcrow">¶</a></p>
+<span id="name-proposed-more-specific-entr"></span><div id="tab-exceptions">
+<table class="center" id="table-3">
+          <caption>
+<a href="#table-3" class="selfRef">Table 3</a>:
+<a href="#name-proposed-more-specific-entr" class="selfRef">Proposed More-Specific Entries</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Address Block</th>
+              <th class="text-left" rowspan="1" colspan="1">Name</th>
+              <th class="text-left" rowspan="1" colspan="1">IPN Identifiers</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">5f01::/48</td>
+              <td class="text-left" rowspan="1" colspan="1">Reserved (IPN Default Allocator)</td>
+              <td class="text-left" rowspan="1" colspan="1">0</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">5f01:e:e000::/36</td>
+              <td class="text-left" rowspan="1" colspan="1">Documentation (IPN Example Range)</td>
+              <td class="text-left" rowspan="1" colspan="1">0xEE000-0xEEFFF</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">5f01:4000::/18</td>
+              <td class="text-left" rowspan="1" colspan="1">Reserved (IPN Experimental Use range)</td>
+              <td class="text-left" rowspan="1" colspan="1">0x40000000-0x7FFFFFFF</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">5f01:8000::/17</td>
+              <td class="text-left" rowspan="1" colspan="1">Reserved (IPN Reserved range)</td>
+              <td class="text-left" rowspan="1" colspan="1">0x80000000-0xFFFFFFFF</td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+<p id="section-8.3-3">Each entry uses the values that follow for the other fields:<a href="#section-8.3-3" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlCompact dlParallel" id="section-8.3-4">
+          <dt id="section-8.3-4.1">RFC:</dt>
+          <dd style="margin-left: 1.5em" id="section-8.3-4.2">
+            <p id="section-8.3-4.2.1">This document<a href="#section-8.3-4.2.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-8.3-4.3">Allocation Date:</dt>
+          <dd style="margin-left: 1.5em" id="section-8.3-4.4">
+            <p id="section-8.3-4.4.1">The date that IANA allocates the common prefix<a href="#section-8.3-4.4.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-8.3-4.5">Termination Date:</dt>
+          <dd style="margin-left: 1.5em" id="section-8.3-4.6">
+            <p id="section-8.3-4.6.1">N/A<a href="#section-8.3-4.6.1" class="pilcrow">¶</a></p>
+</dd>
+          <dd class="break"></dd>
+<dt id="section-8.3-4.7">Source, Destination, Forwardable, Globally Reachable, and Reserved-by-Protocol:</dt>
+          <dd style="margin-left: 1.5em" id="section-8.3-4.8">
+            <p id="section-8.3-4.8.1">False<a href="#section-8.3-4.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+</dl>
+<p id="section-8.3-5">These values match the Documentation entry for 3fff::/20 and rules 4 to 7 of <a href="#eligibility" class="auto internal xref">Section 4</a>.
+In each name, the first word gives the IPv6 status, and the parenthetical identifies the IPN identifiers.
+For example, 5f01:4000::/18 is reserved IPv6 space and does not permit IPv6 experimental deployment.<a href="#section-8.3-5" class="pilcrow">¶</a></p>
+<p id="section-8.3-6">A later change to the IPN registry does not remove an IPv6 exclusion specified by this document.
+Use of an excluded IPv6 block requires a separate specification and the applicable IANA updates.<a href="#section-8.3-6" class="pilcrow">¶</a></p>
+<p id="section-8.3-7">IANA does not record individual derived prefixes.
+An ordinary assignment in an eligible range becomes usable without a second per-identifier registration (<a href="#eligibility" class="auto internal xref">Section 4</a>).
+This document does not request entries for currently unassigned identifiers.<a href="#section-8.3-7" class="pilcrow">¶</a></p>
+<p id="section-8.3-8">Editor's Note:
+The author requests IANA and community review of the entries in this section (<a href="#open-issues" class="auto internal xref">Appendix A</a>).<a href="#section-8.3-8" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="iana-ipn">
+<section id="section-8.4">
+        <h3 id="name-ipn-scheme-uri-allocator-id">
+<a href="#section-8.4" class="section-number selfRef">8.4. </a><a href="#name-ipn-scheme-uri-allocator-id" class="section-name selfRef">'ipn' Scheme URI Allocator Identifiers Registry</a>
+        </h3>
+<p id="section-8.4-1">This document makes no changes to the "'ipn' Scheme URI Allocator Identifiers" registry <span>[<a href="#IANA-IPN" class="cite xref">IANA-IPN</a>]</span>.
+It makes no changes to the registration procedures of that registry.<a href="#section-8.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="sec-combined-references">
+<section id="section-9">
+      <h2 id="name-references">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-references" class="section-name selfRef">References</a>
+      </h2>
+<div id="sec-normative-references">
+<section id="section-9.1">
+        <h3 id="name-normative-references">
+<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
+<dl class="references">
+<dt id="IANA-IPN">[IANA-IPN]</dt>
+        <dd>
+<span class="refAuthor">IANA</span>, <span class="refTitle">"'ipn' Scheme URI Allocator Identifiers"</span>, <span>n.d.</span>, <span>&lt;<a href="https://www.iana.org/assignments/uri-schemes">https://www.iana.org/assignments/uri-schemes</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2119">[RFC2119]</dt>
+        <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC4291">[RFC4291]</dt>
+        <dd>
+<span class="refAuthor">Hinden, R.</span> and <span class="refAuthor">S. Deering</span>, <span class="refTitle">"IP Version 6 Addressing Architecture"</span>, <span class="seriesInfo">RFC 4291</span>, <span class="seriesInfo">DOI 10.17487/RFC4291</span>, <time datetime="2006-02" class="refDate">February 2006</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc4291">https://www.rfc-editor.org/rfc/rfc4291</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC6890">[RFC6890]</dt>
+        <dd>
+<span class="refAuthor">Cotton, M.</span>, <span class="refAuthor">Vegoda, L.</span>, <span class="refAuthor">Bonica, R., Ed.</span>, and <span class="refAuthor">B. Haberman</span>, <span class="refTitle">"Special-Purpose IP Address Registries"</span>, <span class="seriesInfo">BCP 153</span>, <span class="seriesInfo">RFC 6890</span>, <span class="seriesInfo">DOI 10.17487/RFC6890</span>, <time datetime="2013-04" class="refDate">April 2013</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6890">https://www.rfc-editor.org/rfc/rfc6890</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7136">[RFC7136]</dt>
+        <dd>
+<span class="refAuthor">Carpenter, B.</span> and <span class="refAuthor">S. Jiang</span>, <span class="refTitle">"Significance of IPv6 Interface Identifiers"</span>, <span class="seriesInfo">RFC 7136</span>, <span class="seriesInfo">DOI 10.17487/RFC7136</span>, <time datetime="2014-02" class="refDate">February 2014</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7136">https://www.rfc-editor.org/rfc/rfc7136</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8174">[RFC8174]</dt>
+        <dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8190">[RFC8190]</dt>
+        <dd>
+<span class="refAuthor">Bonica, R.</span>, <span class="refAuthor">Cotton, M.</span>, <span class="refAuthor">Haberman, B.</span>, and <span class="refAuthor">L. Vegoda</span>, <span class="refTitle">"Updates to the Special-Purpose IP Address Registries"</span>, <span class="seriesInfo">BCP 153</span>, <span class="seriesInfo">RFC 8190</span>, <span class="seriesInfo">DOI 10.17487/RFC8190</span>, <time datetime="2017-06" class="refDate">June 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8190">https://www.rfc-editor.org/rfc/rfc8190</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9758">[RFC9758]</dt>
+      <dd>
+<span class="refAuthor">Taylor, R.</span> and <span class="refAuthor">E. Birrane III</span>, <span class="refTitle">"Updates to the 'ipn' URI Scheme"</span>, <span class="seriesInfo">RFC 9758</span>, <span class="seriesInfo">DOI 10.17487/RFC9758</span>, <time datetime="2025-05" class="refDate">May 2025</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9758">https://www.rfc-editor.org/rfc/rfc9758</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="sec-informative-references">
+<section id="section-9.2">
+        <h3 id="name-informative-references">
+<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="IANA-IPV6-SPACE">[IANA-IPV6-SPACE]</dt>
+        <dd>
+<span class="refAuthor">IANA</span>, <span class="refTitle">"IPv6 Address Space"</span>, <span>n.d.</span>, <span>&lt;<a href="https://www.iana.org/assignments/ipv6-address-space">https://www.iana.org/assignments/ipv6-address-space</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="IANA-IPV6-SPECIAL">[IANA-IPV6-SPECIAL]</dt>
+        <dd>
+<span class="refAuthor">IANA</span>, <span class="refTitle">"IPv6 Special-Purpose Address Space"</span>, <span>n.d.</span>, <span>&lt;<a href="https://www.iana.org/assignments/iana-ipv6-special-registry">https://www.iana.org/assignments/iana-ipv6-special-registry</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC1897">[RFC1897]</dt>
+        <dd>
+<span class="refAuthor">Hinden, R.</span> and <span class="refAuthor">J. Postel</span>, <span class="refTitle">"IPv6 Testing Address Allocation"</span>, <span class="seriesInfo">RFC 1897</span>, <span class="seriesInfo">DOI 10.17487/RFC1897</span>, <time datetime="1996-01" class="refDate">January 1996</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc1897">https://www.rfc-editor.org/rfc/rfc1897</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC3701">[RFC3701]</dt>
+        <dd>
+<span class="refAuthor">Fink, R.</span> and <span class="refAuthor">R. Hinden</span>, <span class="refTitle">"6bone (IPv6 Testing Address Allocation) Phaseout"</span>, <span class="seriesInfo">RFC 3701</span>, <span class="seriesInfo">DOI 10.17487/RFC3701</span>, <time datetime="2004-03" class="refDate">March 2004</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc3701">https://www.rfc-editor.org/rfc/rfc3701</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC4862">[RFC4862]</dt>
+        <dd>
+<span class="refAuthor">Thomson, S.</span>, <span class="refAuthor">Narten, T.</span>, and <span class="refAuthor">T. Jinmei</span>, <span class="refTitle">"IPv6 Stateless Address Autoconfiguration"</span>, <span class="seriesInfo">RFC 4862</span>, <span class="seriesInfo">DOI 10.17487/RFC4862</span>, <time datetime="2007-09" class="refDate">September 2007</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc4862">https://www.rfc-editor.org/rfc/rfc4862</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC5156">[RFC5156]</dt>
+        <dd>
+<span class="refAuthor">Blanchet, M.</span>, <span class="refTitle">"Special-Use IPv6 Addresses"</span>, <span class="seriesInfo">RFC 5156</span>, <span class="seriesInfo">DOI 10.17487/RFC5156</span>, <time datetime="2008-04" class="refDate">April 2008</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc5156">https://www.rfc-editor.org/rfc/rfc5156</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC5952">[RFC5952]</dt>
+        <dd>
+<span class="refAuthor">Kawamura, S.</span> and <span class="refAuthor">M. Kawashima</span>, <span class="refTitle">"A Recommendation for IPv6 Address Text Representation"</span>, <span class="seriesInfo">RFC 5952</span>, <span class="seriesInfo">DOI 10.17487/RFC5952</span>, <time datetime="2010-08" class="refDate">August 2010</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc5952">https://www.rfc-editor.org/rfc/rfc5952</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC6480">[RFC6480]</dt>
+        <dd>
+<span class="refAuthor">Lepinski, M.</span> and <span class="refAuthor">S. Kent</span>, <span class="refTitle">"An Infrastructure to Support Secure Internet Routing"</span>, <span class="seriesInfo">RFC 6480</span>, <span class="seriesInfo">DOI 10.17487/RFC6480</span>, <time datetime="2012-02" class="refDate">February 2012</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6480">https://www.rfc-editor.org/rfc/rfc6480</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7421">[RFC7421]</dt>
+        <dd>
+<span class="refAuthor">Carpenter, B., Ed.</span>, <span class="refAuthor">Chown, T.</span>, <span class="refAuthor">Gont, F.</span>, <span class="refAuthor">Jiang, S.</span>, <span class="refAuthor">Petrescu, A.</span>, and <span class="refAuthor">A. Yourtchenko</span>, <span class="refTitle">"Analysis of the 64-bit Boundary in IPv6 Addressing"</span>, <span class="seriesInfo">RFC 7421</span>, <span class="seriesInfo">DOI 10.17487/RFC7421</span>, <time datetime="2015-01" class="refDate">January 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7421">https://www.rfc-editor.org/rfc/rfc7421</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7608">[RFC7608]</dt>
+        <dd>
+<span class="refAuthor">Boucadair, M.</span>, <span class="refAuthor">Petrescu, A.</span>, and <span class="refAuthor">F. Baker</span>, <span class="refTitle">"IPv6 Prefix Length Recommendation for Forwarding"</span>, <span class="seriesInfo">BCP 198</span>, <span class="seriesInfo">RFC 7608</span>, <span class="seriesInfo">DOI 10.17487/RFC7608</span>, <time datetime="2015-07" class="refDate">July 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7608">https://www.rfc-editor.org/rfc/rfc7608</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8949">[RFC8949]</dt>
+        <dd>
+<span class="refAuthor">Bormann, C.</span> and <span class="refAuthor">P. Hoffman</span>, <span class="refTitle">"Concise Binary Object Representation (CBOR)"</span>, <span class="seriesInfo">STD 94</span>, <span class="seriesInfo">RFC 8949</span>, <span class="seriesInfo">DOI 10.17487/RFC8949</span>, <time datetime="2020-12" class="refDate">December 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8949">https://www.rfc-editor.org/rfc/rfc8949</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9171">[RFC9171]</dt>
+        <dd>
+<span class="refAuthor">Burleigh, S.</span>, <span class="refAuthor">Fall, K.</span>, and <span class="refAuthor">E. Birrane, III</span>, <span class="refTitle">"Bundle Protocol Version 7"</span>, <span class="seriesInfo">RFC 9171</span>, <span class="seriesInfo">DOI 10.17487/RFC9171</span>, <time datetime="2022-01" class="refDate">January 2022</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9171">https://www.rfc-editor.org/rfc/rfc9171</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9602">[RFC9602]</dt>
+        <dd>
+<span class="refAuthor">Krishnan, S.</span>, <span class="refTitle">"Segment Routing over IPv6 (SRv6) Segment Identifiers in the IPv6 Addressing Architecture"</span>, <span class="seriesInfo">RFC 9602</span>, <span class="seriesInfo">DOI 10.17487/RFC9602</span>, <time datetime="2024-10" class="refDate">October 2024</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9602">https://www.rfc-editor.org/rfc/rfc9602</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9812">[RFC9812]</dt>
+      <dd>
+<span class="refAuthor">Carpenter, B.</span>, <span class="refAuthor">Krishnan, S.</span>, and <span class="refAuthor">D. Farmer</span>, <span class="refTitle">"Clarification of IPv6 Address Allocation Policy"</span>, <span class="seriesInfo">BCP 242</span>, <span class="seriesInfo">RFC 9812</span>, <span class="seriesInfo">DOI 10.17487/RFC9812</span>, <time datetime="2025-10" class="refDate">October 2025</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9812">https://www.rfc-editor.org/rfc/rfc9812</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+</section>
+</div>
+<div id="open-issues">
+<section id="appendix-A">
+      <h2 id="name-open-issues">
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-open-issues" class="section-name selfRef">Open Issues</a>
+      </h2>
+<p id="appendix-A-1">This section is to be removed before publishing as an RFC.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<p id="appendix-A-2">The issues that follow need review.
+Each item gives the current working choice.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="appendix-A-3">
+        <dt id="appendix-A-3.1">Intended publication status:</dt>
+        <dd style="margin-left: 1.5em" id="appendix-A-3.2">
+          <p id="appendix-A-3.2.1">The working choice is Experimental (<a href="#experiment" class="auto internal xref">Section 1.3</a>).
+An Experimental document that updates <span>[<a href="#RFC4291" class="cite xref">RFC4291</a>]</span> can require review of this choice.<a href="#appendix-A-3.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="appendix-A-3.3">Allocation lifetime:</dt>
+        <dd style="margin-left: 1.5em" id="appendix-A-3.4">
+          <p id="appendix-A-3.4.1">This draft requests an allocation without a scheduled termination date.
+Publication status and allocation lifetime are separate choices.
+Review can choose a different lifetime.<a href="#appendix-A-3.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="appendix-A-3.5">Acceptance and interoperability of the RFC 4291 exception:</dt>
+        <dd style="margin-left: 1.5em" id="appendix-A-3.6">
+          <p id="appendix-A-3.6.1">The working choice updates RFC 4291 for the common prefix (<a href="#update-4291" class="auto internal xref">Section 3.5</a>).
+Review needs to decide whether to accept this exception.
+Review also needs to assess interoperability with hosts and links that assume 64-bit interface identifiers.<a href="#appendix-A-3.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="appendix-A-3.7">Routing scope and registry properties:</dt>
+        <dd style="margin-left: 1.5em" id="appendix-A-3.8">
+          <p id="appendix-A-3.8.1">The working choice permits routing between administrative domains, subject to agreement and routing policy.
+The parent entry sets "Globally Reachable" to True.
+An alternative is a limited-domain design, such as the design for 5f00::/16.<a href="#appendix-A-3.8.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="appendix-A-3.9">Registry treatment of excluded identifiers:</dt>
+        <dd style="margin-left: 1.5em" id="appendix-A-3.10">
+          <p id="appendix-A-3.10.1">The working choice is the set of more-specific entries in <a href="#iana-exceptions" class="auto internal xref">Section 8.3</a>.
+Unassigned identifiers receive no entries.<a href="#appendix-A-3.10.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="appendix-A-3.11">Effects on IPN assignment policy:</dt>
+        <dd style="margin-left: 1.5em" id="appendix-A-3.12">
+          <p id="appendix-A-3.12.1">The working choice makes no change to IPN assignment procedures.
+The Designated Experts for the IPN registry need to review the incentives in <a href="#security" class="auto internal xref">Section 7</a>.<a href="#appendix-A-3.12.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="appendix-A-3.13">Routing authorization and reassignment procedures:</dt>
+        <dd style="margin-left: 1.5em" id="appendix-A-3.14">
+          <p id="appendix-A-3.14.1">The working choice ties authority to the current IPN registry assignment.
+This document defines no new authorization mechanism.
+The source of routing authorization for derived prefixes needs review.<a href="#appendix-A-3.14.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="changes">
+<section id="appendix-B">
+      <h2 id="name-changes-since-00">
+<a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-changes-since-00" class="section-name selfRef">Changes Since -00</a>
+      </h2>
+<p id="appendix-B-1">This section is to be removed before publishing as an RFC.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
+<ul class="compact">
+<li class="compact" id="appendix-B-2.1">
+          <p id="appendix-B-2.1.1">Added "Updates: 4291" and specified the interface identifier exception as an update to RFC 4291, as updated by RFC 7136.<a href="#appendix-B-2.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="compact" id="appendix-B-2.2">
+          <p id="appendix-B-2.2.1">Separated assignment, forwarding, and host address configuration in <a href="#allocator-space" class="auto internal xref">Section 3.4</a>.<a href="#appendix-B-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="compact" id="appendix-B-2.3">
+          <p id="appendix-B-2.3.1">Added <a href="#slaac" class="auto internal xref">Section 3.6</a> on SLAAC and link-type constraints.<a href="#appendix-B-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="compact" id="appendix-B-2.4">
+          <p id="appendix-B-2.4.1">Added the Experiment Scope subsection.<a href="#appendix-B-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="compact" id="appendix-B-2.5">
+          <p id="appendix-B-2.5.1">Limited the authorization requirement to address assignment and prefix delegation.<a href="#appendix-B-2.5.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="compact" id="appendix-B-2.6">
+          <p id="appendix-B-2.6.1">Stated that forwarding does not require registry queries.<a href="#appendix-B-2.6.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="compact" id="appendix-B-2.7">
+          <p id="appendix-B-2.7.1">Completed the fields of the more-specific IANA entries and clarified their names.<a href="#appendix-B-2.7.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="compact" id="appendix-B-2.8">
+          <p id="appendix-B-2.8.1">Stated that later IPN registry changes do not remove IPv6 exclusions.<a href="#appendix-B-2.8.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="compact" id="appendix-B-2.9">
+          <p id="appendix-B-2.9.1">Removed the claim that former 6bone use makes the block suitable for an experiment.<a href="#appendix-B-2.9.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="compact" id="appendix-B-2.10">
+          <p id="appendix-B-2.10.1">Separated allocation lifetime from publication status in the Open Issues appendix.<a href="#appendix-B-2.10.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="compact" id="appendix-B-2.11">
+          <p id="appendix-B-2.11.1">Revised the filter, reachability, and reassignment text.<a href="#appendix-B-2.11.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-C">
+      <h2 id="name-authors-address">
+<a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Erik Kline</span></div>
+<div dir="auto" class="left"><span class="org">Aalyria Technologies Inc.</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:ek.ietf@gmail.com" class="email">ek.ietf@gmail.com</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>

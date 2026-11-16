@@ -1,0 +1,762 @@
+
+
+
+
+Network Working Group                                           E. Kline
+Internet-Draft                                 Aalyria Technologies Inc.
+Updates: 4291 (if approved)                             16 November 2026
+Intended status: Experimental                                           
+Expires: 20 May 2027
+
+
+          IPv6 Prefixes Derived from IPN Allocator Identifiers
+             draft-ek-tiptop-ipn-allocator-prefixes-latest
+
+Abstract
+
+   This document requests an IPv6 /16 prefix for use by IPN Allocators.
+   It defines a method to derive an IPv6 /48 prefix from a 32-bit IPN
+   Allocator Identifier.  Use of the derived prefix is optional.  The
+   method reuses the existing IPN Allocator registry.  It does not
+   encode physical location or define a routing mechanism.  The
+   preferred /16 prefix is 5f01::/16.  This document also updates RFC
+   4291 to permit other interface identifier lengths within the
+   allocated block.
+
+About This Document
+
+   This note is to be removed before publishing as an RFC.
+
+   The latest revision of this draft can be found at
+   https://ekline.github.io/draft-ipn-allocator-prefixes/draft-ek-
+   tiptop-ipn-allocator-prefixes.html.  Status information for this
+   document may be found at https://datatracker.ietf.org/doc/draft-ek-
+   tiptop-ipn-allocator-prefixes/.
+
+   Source for this draft and an issue tracker can be found at
+   https://github.com/ekline/draft-ipn-allocator-prefixes.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 20 May 2027.
+
+Copyright Notice
+
+   Copyright (c) 2026 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction
+     1.1.  Scope
+     1.2.  Motivation
+     1.3.  Experiment Scope
+   2.  Conventions and Definitions
+   3.  Prefix Construction
+     3.1.  Common Prefix
+     3.2.  Address Layout
+     3.3.  Derivation
+     3.4.  Allocator-Controlled Address Space
+     3.5.  Update to RFC 4291
+     3.6.  Address Configuration
+   4.  Eligibility and Optional Use
+     4.1.  The Default Allocator
+   5.  Examples
+   6.  Routing and Operational Considerations
+   7.  Security Considerations
+   8.  IANA Considerations
+     8.1.  IPv6 Address Space Registry
+     8.2.  IPv6 Special-Purpose Address Space Registry
+     8.3.  More-Specific Entries
+     8.4.  'ipn' Scheme URI Allocator Identifiers Registry
+   9.  References
+     9.1.  Normative References
+     9.2.  Informative References
+   Appendix A.  Open Issues
+   Appendix B.  Changes Since -00
+   Author's Address
+
+1.  Introduction
+
+   An IPN Allocator Identifier [RFC9758] identifies an authority that
+   assigns IPN Node Numbers.  This document associates an optional IPv6
+   prefix with that authority.  The association does not describe
+   network topology.  It does not identify a next hop or establish a
+   route.
+
+   An Allocator can use the derived prefix to assign IPv6 addresses
+   within networks under its administration.  The method reuses the
+   existing "'ipn' Scheme URI Allocator Identifiers" registry
+   [IANA-IPN].  It does not require a new per-identifier registry.
+
+1.1.  Scope
+
+   This document defines an address assignment mechanism.  The mechanism
+   applies to terrestrial networks and to space networks.  This document
+   also updates [RFC4291] for addresses within the common prefix
+   (Section 3.5).
+
+   This document does not define:
+
+   *  a conversion between an IPN endpoint identifier and an IPv6
+      address;
+   *  an encoding of an IPN Node Number or Service Number in an IPv6
+      address;
+   *  a Bundle Protocol [RFC9171] convergence layer;
+   *  a method to carry IPv6 packets in bundles;
+   *  a routing protocol or an automatic route discovery mechanism; or
+   *  a requirement to use IPv6 in all Delay-Tolerant Networking (DTN)
+      deployments.
+
+1.2.  Motivation
+
+   An Allocator already manages a namespace for IPN Node Numbers.  A
+   corresponding IPv6 prefix can simplify address administration for
+   networks that use both IPN identifiers and IPv6 addresses.
+
+   Physical location does not determine network connectivity or transit
+   policy.  This document does not assign prefixes to celestial bodies.
+
+   An Allocator can retain its derived prefix when its equipment changes
+   location.  Continued reachability depends on the available routes and
+   applicable routing policy.  This document makes no routing
+   scalability guarantee.  It does not define a mobility mechanism.
+
+1.3.  Experiment Scope
+
+   This document specifies an experiment.  The experiment evaluates
+   these questions:
+
+   *  whether registry-derived prefixes simplify address administration;
+   *  whether participating implementations support the intended address
+      structures;
+   *  whether routing and filtering permit the intended connectivity;
+      and
+   *  whether changes in Allocator control can occur without conflicting
+      assignments.
+
+   This document encourages operators and implementers to publish
+   reports of their deployment experience.  The experiment makes no
+   claim of automatic route aggregation or improved routing scalability.
+
+2.  Conventions and Definitions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+   This document uses the terms "Node Number" and "Service Number" as
+   defined in [RFC9758].  This document also uses the terms that follow.
+
+   Allocator:  An organization or other authority that assigns IPN Node
+      Numbers (Section 3.2 of [RFC9758]).
+
+   Allocator Identifier:  An unsigned 32-bit integer A that identifies
+      an Allocator (Section 3.2 of [RFC9758]).  "The Allocator of A" is
+      the Allocator that the IANA registry [IANA-IPN] currently lists
+      for A.
+
+   Common prefix:  The IPv6 /16 prefix that this document requests.  The
+      preferred value is 5f01::/16.
+
+   Derived prefix:  The IPv6 /48 prefix P(A) associated with one
+      Allocator Identifier A.
+
+   Eligible identifier:  An Allocator Identifier that this document
+      permits for ordinary use.  Section 4 gives the rules.
+
+   An Allocator can hold more than one Allocator Identifier (Section 3.2
+   of [RFC9758]).  Each Allocator Identifier is associated with only one
+   Allocator.  This document provides one derived prefix for each
+   eligible identifier.  Thus, one Allocator can have more than one
+   derived prefix.
+
+3.  Prefix Construction
+
+3.1.  Common Prefix
+
+   This document requests 5f01::/16 as the common prefix.  Until IANA
+   allocates the common prefix, 5f01::/16 is requested and unassigned
+   for this purpose.  Until then, an Allocator MUST NOT treat an
+   eligible identifier as permission to use 5f01::/16.  The allocation
+   requires IETF Review (Section 8.1).
+
+   The first instance of the 6bone experimental network used 5f00::/8
+   for IPv6 testing [RFC1897] [RFC3701].  That block was later returned
+   to IANA for future allocation [RFC5156].  [RFC9602] then assigned
+   5f00::/16 for Segment Routing over IPv6 (SRv6) Segment Identifiers
+   (SIDs).
+
+   Allocating 5f01::/16 extends the allocation adjacent to 5f00::/16.
+   Within the remaining 5f00::/8 space, this choice avoids splitting a
+   larger aligned block.  The mechanism does not depend on the specific
+   /16 value or on SRv6.
+
+   Note to the RFC Editor: If IANA allocates a /16 other than 5f01::/16,
+   replace "5f01" with the allocated value throughout this document.
+   This replacement includes the derived prefixes, the examples, and the
+   IANA entries.  Also revise the rationale in this section and the
+   filter text in Section 6.  Then remove this note.
+
+3.2.  Address Layout
+
+   This document numbers the 128 bits of an IPv6 address from 0 to 127.
+   Bit 0 is the most significant bit.
+
+         +========+=========+====================================+
+         | Bits   |  Length | Field                              |
+         +========+=========+====================================+
+         | 0-15   | 16 bits | Common prefix                      |
+         +--------+---------+------------------------------------+
+         | 16-47  | 32 bits | Allocator Identifier               |
+         +--------+---------+------------------------------------+
+         | 48-127 | 80 bits | Allocator-controlled address space |
+         +--------+---------+------------------------------------+
+
+             Table 1: Layout of an Address in a Derived Prefix
+
+   The requirements that follow apply to each party that constructs a
+   derived prefix.  The derived prefix MUST contain the complete 32-bit
+   Allocator Identifier immediately after the common prefix.  The
+   identifier MUST appear in network byte order.  Leading zero bits are
+   significant in this binary field.  The lengths of the decimal text
+   form and of the Concise Binary Object Representation (CBOR) [RFC8949]
+   encoding have no effect on the field.  A 16-bit common prefix and a
+   32-bit Allocator Identifier produce a /48.
+
+3.3.  Derivation
+
+   For an Allocator Identifier A, define two 16-bit values:
+
+   *  H = floor(A / 65536), the 16 most significant bits of A
+   *  L = A modulo 65536, the 16 least significant bits of A
+
+   With the requested common prefix, the derived prefix is:
+
+   P(A) = 5f01:H:L::/48
+
+   H and L are written as hexadecimal fields of the IPv6 text form
+   (Section 2.2 of [RFC4291]).  The examples in this document use the
+   recommended text form (Section 4 of [RFC5952]).
+
+3.4.  Allocator-Controlled Address Space
+
+   Bits 48 to 127 of each address in P(A) are under the control of the
+   Allocator of A.  The Allocator controls address assignment and prefix
+   delegation within P(A).  These activities remain subject to this
+   document and applicable IPv6 specifications.  This document does not
+   require a particular structure or encoding in these 80 bits.
+
+   Assignment:  The Allocator can assign prefixes of any length within
+      P(A).  Ordinary /64 subnets remain permitted.
+
+   Routing and forwarding:  IPv6 forwarding processes support prefixes
+      of any length [RFC7608].  Routing policy determines which prefix
+      lengths operators advertise and accept.  Forwarding support does
+      not establish support for host address configuration.
+
+   Host interface addresses:  Section 3.5 permits interface identifiers
+      other than 64 bits within the common prefix.  Host and link
+      support for other lengths varies (Section 3.6).
+
+3.5.  Update to RFC 4291
+
+   For addresses within the common prefix, this document removes the
+   requirement for a 64-bit interface identifier.  This exception
+   updates Sections 2.5.1 and 2.5.4 of [RFC4291].  It applies only to
+   the common prefix allocated by this document.
+
+   Section 2.5.1 of [RFC4291], as updated by Section 5 of [RFC7136],
+   requires 64-bit interface identifiers for unicast addresses that do
+   not start with binary 000.  Section 2.5.4 of [RFC4291] states the
+   same constraint for Global Unicast addresses.  This document adds the
+   text that follows after each of these two statements:
+
+      This requirement does not apply to addresses within the IPv6 block
+      allocated for IPv6 Prefixes Derived from IPN Allocator Identifiers
+      (RFC XXXX).  In that block, an interface identifier can have any
+      length that the subnet prefix permits.
+
+   Note to the RFC Editor: Replace "RFC XXXX" with the number of this
+   document, then remove this note.
+
+   All other text of Section 2.5.1, as updated by [RFC7136], still
+   applies.  For example, a 64-bit interface identifier derived from an
+   IEEE MAC-layer address still uses the Modified EUI-64 format.
+
+   [RFC9602] is a limited precedent for this exception.  Its discussion
+   of [RFC4291] concerns SRv6 SIDs that are not assigned to host
+   interfaces.
+
+3.6.  Address Configuration
+
+   This exception does not change SLAAC or link-specific address
+   configuration procedures.  Operators must select address structures
+   that their hosts and links support.
+
+   In Stateless Address Autoconfiguration (SLAAC), a host forms an
+   address from an advertised prefix and an interface identifier.  A
+   link-type specification defines the length of that interface
+   identifier.  Many link-type specifications define a length of 64 bits
+   (Section 4.1 of [RFC7421]).  The host ignores the prefix for address
+   formation if the two lengths do not sum to 128 bits (Section 5.5.3 of
+   [RFC4862], item (d)).  Thus, SLAAC on such links forms addresses only
+   from /64 prefixes.  This document does not define a new SLAAC
+   mechanism.
+
+4.  Eligibility and Optional Use
+
+   The current IANA "'ipn' Scheme URI Allocator Identifiers" registry
+   [IANA-IPN] determines eligibility.  The rules that follow apply to
+   each Allocator Identifier A.
+
+   1.  Ordinary assignment: A current ordinary assignment of A permits
+       the Allocator of A to assign addresses and delegate prefixes from
+       P(A).  An ordinary assignment is a registry entry that assigns A
+       to a named Allocator, alone or in a range.  Rules 3 to 7 take
+       precedence over this rule.
+   2.  Optional use: The Allocator of A decides whether to use P(A).
+       This document does not require a second registration for each
+       identifier.
+   3.  Unassigned identifiers: An unassigned identifier does not permit
+       use of its derived prefix.
+   4.  Reserved identifiers: A reserved identifier does not permit
+       ordinary use.  The reserved identifiers include 0x80000000 to
+       0xFFFFFFFF.
+   5.  Experimental identifiers: Identifiers in the Experimental Use
+       range (0x40000000 to 0x7FFFFFFF) do not confer exclusive control
+       of globally unique IPv6 prefixes.  This document does not specify
+       operational use of their derived prefixes.
+   6.  Example Range: The IPN Example Range (974848 to 978943) is for
+       documentation (Section 9.1 of [RFC9758]).  Its derived prefixes
+       are not for operational deployment.
+   7.  Allocator Identifier zero: Allocator Identifier zero does not
+       permit ordinary use under this specification.  Section 4.1 gives
+       the reason.
+
+   An Allocator Identifier is an eligible identifier only if rule 1
+   applies and rules 3 to 7 do not exclude it.  No other text in this
+   document makes an Allocator Identifier eligible.
+
+   A party MUST NOT assign addresses or delegate prefixes from P(A)
+   unless A is eligible and the party has authority from the Allocator
+   of A.  These eligibility rules govern address assignment and prefix
+   delegation.  They do not require a router to query the IPN registry
+   when forwarding a packet.
+
+4.1.  The Default Allocator
+
+   [RFC9758] assigns Allocator Identifier zero to the Default Allocator
+   (Section 3.2.2 of [RFC9758]).  The Default Allocator serves multiple
+   independent organizations.  Assignment of a Node Number by the
+   Default Allocator does not assign control of the derived /48.  This
+   document reserves P(0), which is 5f01::/48, for future specification.
+   This document does not define a subdivision of P(0).
+
+5.  Examples
+
+   The examples in this section are illustrations.  They use the
+   requested common prefix 5f01::/16 and identifiers from the IPN
+   Example Range.  They do not represent operational IPv6 assignments.
+
+      +======================+===================+==================+
+      | Allocator Identifier | Hexadecimal value | Derived prefix   |
+      +======================+===================+==================+
+      |               974848 | 0x000EE000        | 5f01:e:e000::/48 |
+      +----------------------+-------------------+------------------+
+      |               974849 | 0x000EE001        | 5f01:e:e001::/48 |
+      +----------------------+-------------------+------------------+
+      |               978943 | 0x000EEFFF        | 5f01:e:efff::/48 |
+      +----------------------+-------------------+------------------+
+
+                     Table 2: Example Derived Prefixes
+
+   For A = 974849, H is 14 (0xe) and L is 57345 (0xe001).  The complete
+   Example Range contains 4096 (2^12) identifiers, from 0x000EE000 to
+   0x000EEFFF.  The 12 least significant bits of 0x000EE000 are zero.
+   Thus, the range maps to a prefix of length 48 - 12 = 36:
+
+   5f01:e:e000::/36
+
+6.  Routing and Operational Considerations
+
+   This document specifies address assignment only.  The principles that
+   follow apply to derived prefixes:
+
+   *  A derived prefix does not establish connectivity.
+   *  An address assignment does not require another network to accept a
+      route.
+   *  A shared Allocator does not imply a shared routing domain.
+   *  An Allocator can operate disconnected networks.
+   *  Routing policy determines permitted route advertisements and
+      transit.
+   *  A prefix does not indicate contact times, delay, or available
+      capacity.
+   *  Ordinary IPv6 addresses remain available through other assignment
+      mechanisms.
+
+   An Allocator Identifier alone provides no evidence of reachability.
+   Operators determine reachability through their routing mechanisms and
+   policies.
+
+   This document does not define an inherent administrative domain
+   boundary for the common prefix.  Operators MAY exchange routes and
+   traffic for derived prefixes between administrative domains.  Such
+   exchange is subject to agreement between the operators and to their
+   routing policies.  This design does not guarantee acceptance of
+   derived prefixes on the public Internet.
+
+   Existing filters can reject traffic from this block.  Operators need
+   to check filters for unallocated IPv6 space and former 6bone space
+   [RFC5156].  A filter that matches only the SRv6 block 5f00::/16
+   [RFC9602] does not match 5f01::/16.  Broader filters, such as a
+   filter for 5f00::/8, can match both blocks.
+
+   If the IPN registry withdraws or reassigns A, the previous Allocator
+   of A loses its authority over P(A) under this document.
+
+   An Allocator MUST NOT retain authority over P(A) solely because it
+   previously held A.  A change to the contact information of a registry
+   entry alone does not reassign the Allocator Identifier.  Registry
+   changes do not automatically update deployed addresses, routes,
+   filters, or authorization records.  The previous and new Allocators
+   need to coordinate these updates to prevent simultaneous use of P(A).
+
+7.  Security Considerations
+
+   An address in a derived prefix exposes the associated Allocator
+   Identifier.  The Allocator Identifier is public information in the
+   IANA registry.  An observer can use it to associate traffic with the
+   Allocator.
+
+   An Allocator Identifier is not proof of identity.  An attacker can
+   configure an address in the derived prefix of another Allocator.  The
+   arithmetic mapping does not authenticate packets or authorize route
+   advertisements.  Registry information does not, by itself,
+   authenticate a route origin.
+
+   Route leaks and unauthorized route advertisements remain possible.
+   An operator that accepts a route for a derived prefix needs to verify
+   the origin under its own policy.  This document does not create
+   Resource Public Key Infrastructure (RPKI) [RFC6480] certificates.  It
+   does not create Route Origin Authorizations (ROAs) or a new trust
+   anchor.
+
+   After reassignment, stale filters can block traffic for the new
+   Allocator of A.  Stale authorization can let the previous Allocator
+   of A continue to originate routes.
+
+   More than one party can use the same experimental identifier.  For
+   this reason, rule 5 in Section 4 excludes these identifiers from
+   ordinary use.
+
+   Interface identifiers shorter than 64 bits reduce the address space
+   that an attacker needs to scan (Section 5 of [RFC7421]).
+
+   IPv6 prefix eligibility can create new incentives to request IPN
+   Allocator Identifiers or large identifier ranges.  An aligned range
+   of 2^k identifiers maps to an aggregate of length 48 - k.  The
+   existing IPN assignment procedures were not designed solely to
+   distribute IPv6 address space.
+
+8.  IANA Considerations
+
+8.1.  IPv6 Address Space Registry
+
+   IANA is requested to allocate a /16 address block for "IPv6 Prefixes
+   Derived from IPN Allocator Identifiers".  The preferred address block
+   is 5f01::/16.
+
+   This block is in 5f00::/8, the former 6bone testing block
+   (Section 3.1), within 4000::/3.  The "IPv6 Address Space" registry
+   [IANA-IPV6-SPACE] lists 4000::/3 as "Reserved by IETF".  Allocations
+   from this space require IETF Review [RFC9812].
+
+   A 16-bit common prefix and a 32-bit identifier produce a /48.  A
+   smaller block cannot preserve this complete mapping.
+
+   IANA is requested to update the "IPv6 Address Space" registry entry
+   for 4000::/3 to reference this document.
+
+8.2.  IPv6 Special-Purpose Address Space Registry
+
+   IANA is requested to add the entry that follows to the "IPv6 Special-
+   Purpose Address Space" registry [IANA-IPV6-SPECIAL].  [RFC6890] and
+   [RFC8190] define the fields.
+
+   Address Block:  5f01::/16
+   Name:  IPv6 Prefixes Derived from IPN Allocator Identifiers
+   RFC:  This document
+   Allocation Date:  The date that IANA allocates the common prefix
+   Termination Date:  N/A
+   Source:  True
+   Destination:  True
+   Forwardable:  True
+   Globally Reachable:  True
+   Reserved-by-Protocol:  False
+
+   These values are deliberate initial design choices.  They permit
+   ordinary IPv6 forwarding across administrative boundaries.  "Globally
+   Reachable" indicates that a router can forward these datagrams beyond
+   an administrative domain [RFC8190].  It does not guarantee a route.
+
+   The parent entry does not make every derived prefix eligible.  IANA
+   is requested to add this note to the parent entry: "Address
+   assignment and prefix delegation within this block are subject to the
+   eligibility rules in Section 4 of this document."
+
+8.3.  More-Specific Entries
+
+   Some derived prefixes are not for ordinary use.  IANA is requested to
+   add the more-specific entries in Table 3.  These entries take
+   precedence over the parent entry.
+
+     +==================+====================+=======================+
+     | Address Block    | Name               | IPN Identifiers       |
+     +==================+====================+=======================+
+     | 5f01::/48        | Reserved (IPN      | 0                     |
+     |                  | Default Allocator) |                       |
+     +------------------+--------------------+-----------------------+
+     | 5f01:e:e000::/36 | Documentation (IPN | 0xEE000-0xEEFFF       |
+     |                  | Example Range)     |                       |
+     +------------------+--------------------+-----------------------+
+     | 5f01:4000::/18   | Reserved (IPN      | 0x40000000-0x7FFFFFFF |
+     |                  | Experimental Use   |                       |
+     |                  | range)             |                       |
+     +------------------+--------------------+-----------------------+
+     | 5f01:8000::/17   | Reserved (IPN      | 0x80000000-0xFFFFFFFF |
+     |                  | Reserved range)    |                       |
+     +------------------+--------------------+-----------------------+
+
+                  Table 3: Proposed More-Specific Entries
+
+   Each entry uses the values that follow for the other fields:
+
+   RFC:  This document
+   Allocation Date:  The date that IANA allocates the common prefix
+   Termination Date:  N/A
+   Source, Destination, Forwardable, Globally Reachable, and
+   Reserved-by-Protocol:  False
+
+   These values match the Documentation entry for 3fff::/20 and rules 4
+   to 7 of Section 4.  In each name, the first word gives the IPv6
+   status, and the parenthetical identifies the IPN identifiers.  For
+   example, 5f01:4000::/18 is reserved IPv6 space and does not permit
+   IPv6 experimental deployment.
+
+   A later change to the IPN registry does not remove an IPv6 exclusion
+   specified by this document.  Use of an excluded IPv6 block requires a
+   separate specification and the applicable IANA updates.
+
+   IANA does not record individual derived prefixes.  An ordinary
+   assignment in an eligible range becomes usable without a second per-
+   identifier registration (Section 4).  This document does not request
+   entries for currently unassigned identifiers.
+
+   Editor's Note: The author requests IANA and community review of the
+   entries in this section (Appendix A).
+
+8.4.  'ipn' Scheme URI Allocator Identifiers Registry
+
+   This document makes no changes to the "'ipn' Scheme URI Allocator
+   Identifiers" registry [IANA-IPN].  It makes no changes to the
+   registration procedures of that registry.
+
+9.  References
+
+9.1.  Normative References
+
+   [IANA-IPN] IANA, "'ipn' Scheme URI Allocator Identifiers", n.d.,
+              <https://www.iana.org/assignments/uri-schemes>.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC4291]  Hinden, R. and S. Deering, "IP Version 6 Addressing
+              Architecture", RFC 4291, DOI 10.17487/RFC4291, February
+              2006, <https://www.rfc-editor.org/rfc/rfc4291>.
+
+   [RFC6890]  Cotton, M., Vegoda, L., Bonica, R., Ed., and B. Haberman,
+              "Special-Purpose IP Address Registries", BCP 153,
+              RFC 6890, DOI 10.17487/RFC6890, April 2013,
+              <https://www.rfc-editor.org/rfc/rfc6890>.
+
+   [RFC7136]  Carpenter, B. and S. Jiang, "Significance of IPv6
+              Interface Identifiers", RFC 7136, DOI 10.17487/RFC7136,
+              February 2014, <https://www.rfc-editor.org/rfc/rfc7136>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+   [RFC8190]  Bonica, R., Cotton, M., Haberman, B., and L. Vegoda,
+              "Updates to the Special-Purpose IP Address Registries",
+              BCP 153, RFC 8190, DOI 10.17487/RFC8190, June 2017,
+              <https://www.rfc-editor.org/rfc/rfc8190>.
+
+   [RFC9758]  Taylor, R. and E. Birrane III, "Updates to the 'ipn' URI
+              Scheme", RFC 9758, DOI 10.17487/RFC9758, May 2025,
+              <https://www.rfc-editor.org/rfc/rfc9758>.
+
+9.2.  Informative References
+
+   [IANA-IPV6-SPACE]
+              IANA, "IPv6 Address Space", n.d.,
+              <https://www.iana.org/assignments/ipv6-address-space>.
+
+   [IANA-IPV6-SPECIAL]
+              IANA, "IPv6 Special-Purpose Address Space", n.d.,
+              <https://www.iana.org/assignments/iana-ipv6-special-
+              registry>.
+
+   [RFC1897]  Hinden, R. and J. Postel, "IPv6 Testing Address
+              Allocation", RFC 1897, DOI 10.17487/RFC1897, January 1996,
+              <https://www.rfc-editor.org/rfc/rfc1897>.
+
+   [RFC3701]  Fink, R. and R. Hinden, "6bone (IPv6 Testing Address
+              Allocation) Phaseout", RFC 3701, DOI 10.17487/RFC3701,
+              March 2004, <https://www.rfc-editor.org/rfc/rfc3701>.
+
+   [RFC4862]  Thomson, S., Narten, T., and T. Jinmei, "IPv6 Stateless
+              Address Autoconfiguration", RFC 4862,
+              DOI 10.17487/RFC4862, September 2007,
+              <https://www.rfc-editor.org/rfc/rfc4862>.
+
+   [RFC5156]  Blanchet, M., "Special-Use IPv6 Addresses", RFC 5156,
+              DOI 10.17487/RFC5156, April 2008,
+              <https://www.rfc-editor.org/rfc/rfc5156>.
+
+   [RFC5952]  Kawamura, S. and M. Kawashima, "A Recommendation for IPv6
+              Address Text Representation", RFC 5952,
+              DOI 10.17487/RFC5952, August 2010,
+              <https://www.rfc-editor.org/rfc/rfc5952>.
+
+   [RFC6480]  Lepinski, M. and S. Kent, "An Infrastructure to Support
+              Secure Internet Routing", RFC 6480, DOI 10.17487/RFC6480,
+              February 2012, <https://www.rfc-editor.org/rfc/rfc6480>.
+
+   [RFC7421]  Carpenter, B., Ed., Chown, T., Gont, F., Jiang, S.,
+              Petrescu, A., and A. Yourtchenko, "Analysis of the 64-bit
+              Boundary in IPv6 Addressing", RFC 7421,
+              DOI 10.17487/RFC7421, January 2015,
+              <https://www.rfc-editor.org/rfc/rfc7421>.
+
+   [RFC7608]  Boucadair, M., Petrescu, A., and F. Baker, "IPv6 Prefix
+              Length Recommendation for Forwarding", BCP 198, RFC 7608,
+              DOI 10.17487/RFC7608, July 2015,
+              <https://www.rfc-editor.org/rfc/rfc7608>.
+
+   [RFC8949]  Bormann, C. and P. Hoffman, "Concise Binary Object
+              Representation (CBOR)", STD 94, RFC 8949,
+              DOI 10.17487/RFC8949, December 2020,
+              <https://www.rfc-editor.org/rfc/rfc8949>.
+
+   [RFC9171]  Burleigh, S., Fall, K., and E. Birrane, III, "Bundle
+              Protocol Version 7", RFC 9171, DOI 10.17487/RFC9171,
+              January 2022, <https://www.rfc-editor.org/rfc/rfc9171>.
+
+   [RFC9602]  Krishnan, S., "Segment Routing over IPv6 (SRv6) Segment
+              Identifiers in the IPv6 Addressing Architecture",
+              RFC 9602, DOI 10.17487/RFC9602, October 2024,
+              <https://www.rfc-editor.org/rfc/rfc9602>.
+
+   [RFC9812]  Carpenter, B., Krishnan, S., and D. Farmer, "Clarification
+              of IPv6 Address Allocation Policy", BCP 242, RFC 9812,
+              DOI 10.17487/RFC9812, October 2025,
+              <https://www.rfc-editor.org/rfc/rfc9812>.
+
+Appendix A.  Open Issues
+
+   This section is to be removed before publishing as an RFC.
+
+   The issues that follow need review.  Each item gives the current
+   working choice.
+
+   Intended publication status:  The working choice is Experimental
+      (Section 1.3).  An Experimental document that updates [RFC4291]
+      can require review of this choice.
+
+   Allocation lifetime:  This draft requests an allocation without a
+      scheduled termination date.  Publication status and allocation
+      lifetime are separate choices.  Review can choose a different
+      lifetime.
+
+   Acceptance and interoperability of the RFC 4291 exception:  The
+      working choice updates RFC 4291 for the common prefix
+      (Section 3.5).  Review needs to decide whether to accept this
+      exception.  Review also needs to assess interoperability with
+      hosts and links that assume 64-bit interface identifiers.
+
+   Routing scope and registry properties:  The working choice permits
+      routing between administrative domains, subject to agreement and
+      routing policy.  The parent entry sets "Globally Reachable" to
+      True.  An alternative is a limited-domain design, such as the
+      design for 5f00::/16.
+
+   Registry treatment of excluded identifiers:  The working choice is
+      the set of more-specific entries in Section 8.3.  Unassigned
+      identifiers receive no entries.
+
+   Effects on IPN assignment policy:  The working choice makes no change
+      to IPN assignment procedures.  The Designated Experts for the IPN
+      registry need to review the incentives in Section 7.
+
+   Routing authorization and reassignment procedures:  The working
+      choice ties authority to the current IPN registry assignment.
+      This document defines no new authorization mechanism.  The source
+      of routing authorization for derived prefixes needs review.
+
+Appendix B.  Changes Since -00
+
+   This section is to be removed before publishing as an RFC.
+
+   *  Added "Updates: 4291" and specified the interface identifier
+      exception as an update to RFC 4291, as updated by RFC 7136.
+   *  Separated assignment, forwarding, and host address configuration
+      in Section 3.4.
+   *  Added Section 3.6 on SLAAC and link-type constraints.
+   *  Added the Experiment Scope subsection.
+   *  Limited the authorization requirement to address assignment and
+      prefix delegation.
+   *  Stated that forwarding does not require registry queries.
+   *  Completed the fields of the more-specific IANA entries and
+      clarified their names.
+   *  Stated that later IPN registry changes do not remove IPv6
+      exclusions.
+   *  Removed the claim that former 6bone use makes the block suitable
+      for an experiment.
+   *  Separated allocation lifetime from publication status in the Open
+      Issues appendix.
+   *  Revised the filter, reachability, and reassignment text.
+
+Author's Address
+
+   Erik Kline
+   Aalyria Technologies Inc.
+   Email: ek.ietf@gmail.com
