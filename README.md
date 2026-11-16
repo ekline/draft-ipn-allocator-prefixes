@@ -1,8 +1,19 @@
-<!-- regenerate: on (set to off if you edit this file) -->
+<!-- regenerate: off (set to off if you edit this file) -->
 
 # IPv6 Prefixes Derived from IPN Allocator Identifiers
 
 This is the working area for the individual Internet-Draft, "IPv6 Prefixes Derived from IPN Allocator Identifiers".
+
+The draft requests an IPv6 /16 common prefix (preferred value `5f01::/16`).
+It derives an optional IPv6 /48 from each eligible 32-bit IPN Allocator
+Identifier ([RFC 9758](https://www.rfc-editor.org/rfc/rfc9758)):
+`5f01:H:L::/48`, where H and L are the high and low 16 bits of the identifier.
+The derived prefix is an address assignment only. It does not define routing,
+an IPN-to-IPv6 address mapping, or a Bundle Protocol convergence layer.
+
+IANA has not allocated `5f01::/16`. Do not deploy addresses from it.
+The intended status is Experimental. The "Open Issues" appendix lists
+questions for review.
 
 * [Editor's Copy](https://ekline.github.io/draft-ipn-allocator-prefixes/#go.draft-ipn-allocator-prefixes.html)
 * [Datatracker Page](https://datatracker.ietf.org/doc/draft-ipn-allocator-prefixes)
