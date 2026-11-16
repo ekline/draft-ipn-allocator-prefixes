@@ -15,10 +15,10 @@ IANA has not allocated `5f01::/16`. Do not deploy addresses from it.
 The intended status is Experimental. The "Open Issues" appendix lists
 questions for review.
 
-* [Editor's Copy](https://ekline.github.io/draft-ipn-allocator-prefixes/#go.draft-ipn-allocator-prefixes.html)
-* [Datatracker Page](https://datatracker.ietf.org/doc/draft-ipn-allocator-prefixes)
-* [Individual Draft](https://datatracker.ietf.org/doc/html/draft-ipn-allocator-prefixes)
-* [Compare Editor's Copy to Individual Draft](https://ekline.github.io/draft-ipn-allocator-prefixes/#go.draft-ipn-allocator-prefixes.diff)
+* [Editor's Copy](https://ekline.github.io/draft-ipn-allocator-prefixes/#go.draft-ek-tiptop-ipn-allocator-prefixes.html)
+* [Datatracker Page](https://datatracker.ietf.org/doc/draft-ek-tiptop-ipn-allocator-prefixes)
+* [Individual Draft](https://datatracker.ietf.org/doc/html/draft-ek-tiptop-ipn-allocator-prefixes)
+* [Compare Editor's Copy to Individual Draft](https://ekline.github.io/draft-ipn-allocator-prefixes/#go.draft-ek-tiptop-ipn-allocator-prefixes.diff)
 
 
 ## Contributing

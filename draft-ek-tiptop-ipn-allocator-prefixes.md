@@ -3,7 +3,7 @@ title: "IPv6 Prefixes Derived from IPN Allocator Identifiers"
 abbrev: "IPN Allocator Prefixes"
 category: exp
 
-docname: draft-ipn-allocator-prefixes-latest
+docname: draft-ek-tiptop-ipn-allocator-prefixes-latest
 submissiontype: IETF
 number:
 date:
@@ -21,7 +21,7 @@ venue:
 #  mail: tiptop@ietf.org
 #  arch: https://example.com/WG
   github: "ekline/draft-ipn-allocator-prefixes"
-  latest: "https://ekline.github.io/draft-ipn-allocator-prefixes/draft-ipn-allocator-prefixes.html"
+  latest: "https://ekline.github.io/draft-ipn-allocator-prefixes/draft-ek-tiptop-ipn-allocator-prefixes.html"
 
 author:
  -
